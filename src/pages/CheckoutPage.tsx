@@ -3,26 +3,47 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, ShoppingBag, ChevronRight, AlertCircle, Loader2 } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
-import { sendOrderEmails } from '../utils/email';
 import { Order, OrderFormData, PacketaPoint } from '../types';
 import { config } from '../config';
 
 const generateVariableSymbol = (): string =>
   String(Math.floor(100000 + (Date.now() % 900000)));
 
+const ORDER_COOLDOWN_MS = 30_000;
+
 const PACKETA_SCRIPT_URL = 'https://widget.packeta.com/v6/www/js/library.js';
 
-function usePacketaScript() {
+export function usePacketaScript() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (window.Packeta) { setReady(true); return; }
+    if (window.Packeta) {
+      setReady(true);
+      return;
+    }
+
+    const existing = document.querySelector(
+      `script[src="${PACKETA_SCRIPT_URL}"]`
+    ) as HTMLScriptElement | null;
+
+    if (existing) {
+      if (existing.dataset.packetaLoaded === 'true') {
+        setReady(true);
+      } else {
+        existing.addEventListener('load', () => setReady(true), { once: true });
+      }
+      return;
+    }
+
     const script = document.createElement('script');
     script.src = PACKETA_SCRIPT_URL;
     script.async = true;
-    script.onload = () => setReady(true);
+    script.dataset.packetaLoaded = 'false';
+    script.onload = () => {
+      script.dataset.packetaLoaded = 'true';
+      setReady(true);
+    };
     document.head.appendChild(script);
-    return () => { document.head.removeChild(script); };
   }, []);
 
   return ready;
@@ -41,12 +62,70 @@ type FieldErrors = Partial<Record<keyof OrderFormData, string>>;
 
 function validate(form: OrderFormData): FieldErrors {
   const errors: FieldErrors = {};
-  if (!form.firstName.trim()) errors.firstName = 'Povinné pole';
-  if (!form.lastName.trim()) errors.lastName = 'Povinné pole';
-  if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
+
+  // Meno
+  const firstName = form.firstName.trim();
+  if (!firstName) {
+    errors.firstName = 'Povinné pole';
+  } else {
+    if (firstName.length < 2 || firstName.length > 50) {
+      errors.firstName = 'Meno musí mať 2 až 50 znakov.';
+    } else if (!/^[\p{L}\s-]+$/u.test(firstName)) {
+      errors.firstName = 'Zadajte platné meno.';
+    }
+  }
+
+  // Priezvisko
+  const lastName = form.lastName.trim();
+  if (!lastName) {
+    errors.lastName = 'Povinné pole';
+  } else {
+    if (lastName.length < 2 || lastName.length > 50) {
+      errors.lastName = 'Priezvisko musí mať 2 až 50 znakov.';
+    } else if (!/^[\p{L}\s-]+$/u.test(lastName)) {
+      errors.lastName = 'Zadajte platné priezvisko.';
+    }
+  }
+
+  // E-mail
+  const email = form.email.trim();
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > 100) {
     errors.email = 'Zadajte platný e-mail';
-  if (!form.phone.trim()) errors.phone = 'Povinné pole';
-  if (!form.packetaPoint) errors.packetaPoint = 'Vyberte výdajné miesto Packeta';
+  }
+
+  // Telefón
+  const phoneRaw = form.phone.trim();
+  if (!phoneRaw) {
+    errors.phone = 'Povinné pole';
+  } else {
+    let normalized = '';
+    for (let i = 0; i < phoneRaw.length; i += 1) {
+      const ch = phoneRaw[i];
+      if (ch === '+') {
+        if (i === 0 && !normalized.includes('+')) {
+          normalized += '+';
+        }
+      } else if (ch >= '0' && ch <= '9') {
+        normalized += ch;
+      }
+    }
+    const digitsOnly = normalized.replace(/\D/g, '');
+    if (digitsOnly.length < 8 || digitsOnly.length > 15) {
+      errors.phone = 'Zadajte platné telefónne číslo.';
+    }
+  }
+
+  // Poznámka (nepovinná)
+  const note = form.note.trim();
+  if (note && note.length > 500) {
+    errors.note = 'Text je príliš dlhý (max. 500 znakov).';
+  }
+
+  // Packeta
+  if (!form.packetaPoint) {
+    errors.packetaPoint = 'Vyberte výdajné miesto Packeta.';
+  }
+
   return errors;
 }
 
@@ -54,12 +133,15 @@ export default function CheckoutPage() {
   const navigate = useNavigate();
   const { items, totalPrice, clearCart } = useCartStore();
   const packetaReady = usePacketaScript();
-  const packetaBtnRef = useRef<HTMLButtonElement>(null);
 
   const [form, setForm] = useState<OrderFormData>(emptyForm);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [honeypot, setHoneypot] = useState('');
+  const [startedAt] = useState(() => Date.now());
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const captchaRef = useRef<HTMLDivElement | null>(null);
 
   const total = totalPrice();
 
@@ -69,8 +151,20 @@ export default function CheckoutPage() {
   };
 
   const openPacketaWidget = () => {
-    if (!window.Packeta) return;
-    window.Packeta.Widget.pick(
+    const packeta = window.Packeta;
+    if (!packeta || !packeta.Widget || typeof packeta.Widget.pick !== 'function') return;
+
+    // Pre istotu zatvoríme prípadný predchádzajúci instance widgetu,
+    // aby sa pri ďalšom otvorení nenačítaval v "rozbitom" stave.
+    try {
+      if (typeof packeta.Widget.close === 'function') {
+        packeta.Widget.close();
+      }
+    } catch {
+      // ignorujeme chyby pri zatváraní
+    }
+
+    packeta.Widget.pick(
       config.packeta.apiKey,
       (point) => {
         if (!point) return;
@@ -81,17 +175,109 @@ export default function CheckoutPage() {
         };
         setField('packetaPoint', selected);
       },
-      { language: 'sk', country: 'sk', webUrl: window.location.origin, appIdentity: 'roztomile' },
-      packetaBtnRef.current
+      {
+        language: 'sk',
+        country: 'sk',
+        webUrl: window.location.origin,
+        appIdentity: 'roztomile',
+      }
     );
   };
+
+  // Cloudflare Turnstile načítanie a render
+  useEffect(() => {
+    const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
+    if (!siteKey) {
+      console.warn('[checkout] Chýba VITE_TURNSTILE_SITE_KEY pre Turnstile.');
+      return;
+    }
+    if (!captchaRef.current) return;
+
+    const renderWidget = () => {
+      const turnstile = (window as any).turnstile;
+      if (!turnstile || !captchaRef.current) return;
+
+      turnstile.render(captchaRef.current, {
+        sitekey: siteKey,
+        callback: (token: string) => {
+          setCaptchaToken(token);
+          setSubmitError(null);
+        },
+        'error-callback': () => {
+          setCaptchaToken(null);
+        },
+        'timeout-callback': () => {
+          setCaptchaToken(null);
+        },
+      });
+    };
+
+    const existingScript = document.querySelector(
+      'script[src="https://challenges.cloudflare.com/turnstile/v0/api.js"]'
+    ) as HTMLScriptElement | null;
+
+    if (existingScript) {
+      if ((window as any).turnstile) {
+        renderWidget();
+      } else {
+        existingScript.addEventListener('load', renderWidget);
+      }
+      return;
+    }
+
+    const script = document.createElement('script');
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
+    script.async = true;
+    script.defer = true;
+    script.onload = renderWidget;
+    document.head.appendChild(script);
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const fieldErrors = validate(form);
     if (Object.keys(fieldErrors).length > 0) {
       setErrors(fieldErrors);
+      const order: (keyof OrderFormData)[] = [
+        'firstName',
+        'lastName',
+        'email',
+        'phone',
+        'packetaPoint',
+        'note',
+      ];
+      const firstErrorKey = order.find((key) => fieldErrors[key]) as keyof OrderFormData | undefined;
+
+      if (firstErrorKey) {
+        const targetId = firstErrorKey === 'packetaPoint' ? 'packeta' : firstErrorKey;
+        const el = document.getElementById(targetId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          if (el instanceof HTMLInputElement || el instanceof HTMLTextAreaElement) {
+            el.focus();
+          }
+        }
+      }
       return;
+    }
+
+    if (!captchaToken) {
+      setSubmitError('Overenie proti spamu bolo neúspešné. Skúste to prosím znova.');
+      return;
+    }
+
+    // Jednoduchý cooldown na fronte, aby používateľ neklikal opakovane
+    try {
+      const lastOrderRaw = window.sessionStorage.getItem('lastOrderAt');
+      if (lastOrderRaw) {
+        const lastOrder = Number(lastOrderRaw);
+        if (!Number.isNaN(lastOrder) && Date.now() - lastOrder < ORDER_COOLDOWN_MS) {
+          setSubmitError('Objednávku ste práve odoslali. Skúste to prosím znova o chvíľu.');
+          return;
+        }
+      }
+    } catch {
+      // ak sessionStorage zlyhá, len ignorujeme cooldown
     }
 
     setSubmitting(true);
@@ -107,7 +293,40 @@ export default function CheckoutPage() {
     };
 
     try {
-      await sendOrderEmails(order);
+      const response = await fetch('/api/order', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          order,
+          honeypot,
+          startedAt,
+          captchaToken,
+        }),
+      });
+
+      if (!response.ok) {
+        let message = 'Nastala chyba pri odosielaní objednávky. Skúste to prosím znova.';
+        try {
+          const data = await response.json();
+          if (data && typeof data.error === 'string') {
+            message = data.error;
+          }
+        } catch {
+          // ignorujeme chybu pri parsovaní
+        }
+        setSubmitError(message);
+        setSubmitting(false);
+        return;
+      }
+
+      try {
+        window.sessionStorage.setItem('lastOrderAt', String(Date.now()));
+      } catch {
+        // ignorujeme chybu pri zápise
+      }
+
       clearCart();
       navigate('/success', { state: { order } });
     } catch {
@@ -199,6 +418,21 @@ export default function CheckoutPage() {
                   className="w-full px-3.5 py-2.5 text-sm border border-anthracite/15 bg-cream resize-none focus:outline-none focus:ring-2 focus:ring-honey/20 focus:border-honey transition-colors"
                 />
               </div>
+
+              {/* Honeypot field pre bota — skryté pre bežného používateľa */}
+              <div className="hidden">
+                <label htmlFor="company" className="text-xs">
+                  Firma (nevypĺňajte)
+                </label>
+                <input
+                  id="company"
+                  type="text"
+                  autoComplete="off"
+                  tabIndex={-1}
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                />
+              </div>
             </section>
 
             {/* Packeta */}
@@ -231,7 +465,6 @@ export default function CheckoutPage() {
               ) : (
                 <div>
                   <button
-                    ref={packetaBtnRef}
                     type="button"
                     onClick={openPacketaWidget}
                     disabled={!packetaReady}
@@ -315,7 +548,15 @@ export default function CheckoutPage() {
                 )}
               </div>
 
-              <button
+              <div className="space-y-3">
+                <div>
+                  <div ref={captchaRef} className="flex justify-center" />
+                  <p className="mt-2 text-[10px] text-stone/60 text-center leading-relaxed">
+                    Tento formulár je chránený službou Cloudflare Turnstile.
+                  </p>
+                </div>
+
+                <button
                 type="submit"
                 disabled={submitting}
                 className="w-full flex items-center justify-center gap-2 py-3.5 bg-anthracite hover:bg-anthracite/90 disabled:bg-stone/30 text-cream text-xs font-semibold uppercase tracking-widest transition-colors"
@@ -337,6 +578,7 @@ export default function CheckoutPage() {
                 Odoslaním objednávky súhlasíte s{' '}
                 <Link to="/terms" className="text-honey hover:underline">obchodnými podmienkami</Link>.
               </p>
+              </div>
             </div>
           </motion.div>
         </div>

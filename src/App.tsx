@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AnimatePresence, motion, type Variants, type Easing } from 'framer-motion';
 
 import Header from './components/layout/Header';
@@ -9,7 +10,7 @@ import ShopPage from './pages/ShopPage';
 import ProductDetail from './pages/ProductDetail';
 import OurStoryPage from './pages/OurStoryPage';
 import CarePage from './pages/CarePage';
-import CheckoutPage from './pages/CheckoutPage';
+import CheckoutPage, { usePacketaScript } from './pages/CheckoutPage';
 import SuccessPage from './pages/SuccessPage';
 
 const easeOut: Easing = 'easeOut';
@@ -37,6 +38,15 @@ function PageWrapper({ children }: { children: React.ReactNode }) {
 function AppRoutes() {
   const location = useLocation();
 
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const shouldSkipTopScroll = params.get('focus') === 'search';
+
+    if (!shouldSkipTopScroll) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [location.pathname]);
+
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
@@ -52,12 +62,13 @@ function AppRoutes() {
 }
 
 export default function App() {
+  usePacketaScript();
   return (
     <BrowserRouter>
       <div className="flex flex-col min-h-screen">
         <Header />
-        {/* pt-[88px] = top contact bar (~32px) + main nav (64px) + 8px gap */}
-        <div className="flex-1 pt-[88px]">
+        {/* pt-16 = hlavný nav (64px) */}
+        <div className="flex-1 pt-16">
           <AppRoutes />
         </div>
         <Footer />

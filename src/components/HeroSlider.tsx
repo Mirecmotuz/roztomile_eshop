@@ -11,7 +11,7 @@ const slides = [
     heading: 'Veľkonočná\nkolekcia',
     sub: 'Ručne liate sójové sviečky s vôňou jari. Prírodné, udržateľné, krásne.',
     cta: 'Objaviť kolekciu',
-    to: '/?category=sviečky',
+    to: '/?category=sviečky&focus=products',
   },
   {
     id: 2,
@@ -20,7 +20,7 @@ const slides = [
     heading: 'Včelí vosk\nnajlepší priateľ kuchyne',
     sub: 'Ekologická náhrada plastovej fólie z prírodného včelieho vosku. Vydrží rok.',
     cta: 'Pozrieť wrappy',
-    to: '/?category=včelí vosk',
+    to: '/?category=včelí vosk&focus=products',
   },
   {
     id: 3,
@@ -29,7 +29,7 @@ const slides = [
     heading: 'Balzamy na pery\nbez kompromisov',
     sub: 'Len to, čo príroda dala. Žiadny parafín, žiadne silikóny — len čistá starostlivosť.',
     cta: 'Vybrať balzam',
-    to: '/?category=balzamy',
+    to: '/?category=balzamy&focus=products',
   },
 ];
 

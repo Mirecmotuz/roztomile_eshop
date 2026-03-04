@@ -10,9 +10,9 @@ const quickLinks = [
 ];
 
 const categories = [
-  { to: '/?category=sviečky', label: 'Sviečky' },
-  { to: '/?category=včelí vosk', label: 'Včelí vosk' },
-  { to: '/?category=balzamy', label: 'Balzamy na pery' },
+  { to: '/?category=sviečky&focus=products', label: 'Sviečky' },
+  { to: '/?category=včelí vosk&focus=products', label: 'Včelí vosk' },
+  { to: '/?category=balzamy&focus=products', label: 'Balzamy na pery' },
 ];
 
 export default function Footer() {

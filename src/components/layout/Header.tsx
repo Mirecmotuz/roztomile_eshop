@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
-import { Link, NavLink } from 'react-router-dom';
-import { ShoppingBag, Search, Menu, X, Phone, Mail } from 'lucide-react';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { ShoppingBag, Search, Menu, X } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
-import { config } from '../../config';
 
 const navLinks = [
   { to: '/', label: 'E-shop' },
@@ -15,6 +14,7 @@ export default function Header() {
   const [scrolled, setScrolled] = useState(false);
   const { toggleCart, totalItems } = useCartStore();
   const itemCount = totalItems();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 10);
@@ -24,23 +24,6 @@ export default function Header() {
 
   return (
     <header className={`fixed top-0 left-0 right-0 z-40 bg-cream transition-shadow duration-300 ${scrolled ? 'shadow-soft' : ''}`}>
-      {/* Top contact bar — warm stone */}
-      <div className="bg-anthracite/90 text-cream/80 text-[10px]">
-        <div className="max-w-7xl mx-auto px-4 py-1.5 flex items-center justify-between gap-4">
-          <div className="flex items-center gap-5">
-            <a href={`tel:${config.contact.phone}`} className="flex items-center gap-1.5 hover:text-cream transition-colors">
-              <Phone size={10} />
-              <span>{config.contact.phone}</span>
-            </a>
-            <a href={`mailto:${config.contact.email}`} className="flex items-center gap-1.5 hover:text-cream transition-colors">
-              <Mail size={10} />
-              <span>{config.contact.email}</span>
-            </a>
-          </div>
-          <span className="hidden sm:block uppercase tracking-widest text-[9px]">Doprava zadarmo nad 40 €</span>
-        </div>
-      </div>
-
       {/* Main nav */}
       <div className="max-w-7xl mx-auto px-4 border-b border-anthracite/8">
         <div className="flex items-center justify-between h-16">
@@ -76,6 +59,10 @@ export default function Header() {
             <button
               aria-label="Vyhľadávanie"
               className="p-2 text-anthracite/60 hover:text-anthracite transition-colors"
+              onClick={() => {
+                navigate('/?focus=search');
+                setMobileOpen(false);
+              }}
             >
               <Search size={18} />
             </button>
