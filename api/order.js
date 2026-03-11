@@ -4,12 +4,13 @@ const EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID;
 const EMAILJS_OWNER_TEMPLATE_ID = process.env.EMAILJS_OWNER_TEMPLATE_ID;
 const EMAILJS_CUSTOMER_TEMPLATE_ID = process.env.EMAILJS_CUSTOMER_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY;
-const STORE_OWNER_EMAIL = process.env.STORE_OWNER_EMAIL;
-const STORE_IBAN = process.env.STORE_IBAN;
+const EMAILJS_ACCESS_TOKEN = process.env.EMAILJS_PRIVATE_KEY;
+const STORE_OWNER_EMAIL = process.env.VITE_OWNER_EMAIL;
+const STORE_IBAN = process.env.VITE_STORE_IBAN;
 const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
 
 const IP_WINDOW_MS = 10 * 60 * 1000; // 10 minút
-const IP_MAX_REQUESTS = 5;
+const IP_MAX_REQUESTS = 50;
 const EMAIL_WINDOW_MS = 60 * 60 * 1000; // 1 hodina
 const EMAIL_MAX_REQUESTS = 3;
 
@@ -48,7 +49,11 @@ function isRateLimited(store, key, windowMs, maxRequests) {
 
 function formatItems(order) {
   return (order.items || [])
-    .map((i) => `${i.product.name} × ${i.quantity} = ${(i.product.price * i.quantity).toFixed(2)} €`)
+    .map((i) => {
+      const variant = i.variant || i.selectedVariant;
+      const nameWithVariant = variant ? `${i.product.name} (${variant})` : i.product.name;
+      return `${nameWithVariant} × ${i.quantity} = ${(i.product.price * i.quantity).toFixed(2)} €`;
+    })
     .join('\n');
 }
 
@@ -108,14 +113,20 @@ async function verifyTurnstile(token, ip) {
 }
 
 async function sendEmail(templateId, toEmail, params) {
-  if (!EMAILJS_SERVICE_ID || !EMAILJS_PUBLIC_KEY || !templateId || !toEmail) {
+  if (!EMAILJS_SERVICE_ID || !EMAILJS_PUBLIC_KEY || !templateId || !toEmail || !EMAILJS_ACCESS_TOKEN) {
     throw new Error('EmailJS configuration missing');
   }
-
+  console.log("EMAILJS_ACCESS_TOKEN", EMAILJS_ACCESS_TOKEN);
+  console.log("EMAILJS_PUBLIC_KEY", EMAILJS_PUBLIC_KEY);
+  console.log("EMAILJS_SERVICE_ID", EMAILJS_SERVICE_ID);
+  console.log("templateId", templateId);
+  console.log("toEmail", toEmail);
+  console.log("params", params);
   const body = {
     service_id: EMAILJS_SERVICE_ID,
     template_id: templateId,
     user_id: EMAILJS_PUBLIC_KEY,
+    accessToken: EMAILJS_ACCESS_TOKEN,
     template_params: {
       ...params,
       to_email: toEmail,
@@ -136,7 +147,12 @@ async function sendEmail(templateId, toEmail, params) {
   }
 }
 
-module.exports = async function handler(req, res) {
+function resetRateLimitStores() {
+  ipRequests.clear();
+  emailRequests.clear();
+}
+
+async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
     return json(res, 405, { error: 'Method not allowed' });
@@ -212,5 +228,9 @@ module.exports = async function handler(req, res) {
       error: 'Nastala chyba pri odosielaní objednávky. Skúste to prosím znova.',
     });
   }
-};
+}
+
+handler.resetRateLimitStores = resetRateLimitStores;
+
+export default handler;
 

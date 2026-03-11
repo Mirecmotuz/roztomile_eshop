@@ -1,6 +1,7 @@
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { ShoppingBag } from 'lucide-react';
+import { ChevronDown, ShoppingBag } from 'lucide-react';
 import { Product } from '../types';
 import { useCartStore } from '../store/cartStore';
 
@@ -10,6 +11,25 @@ interface Props {
 
 export default function ProductCard({ product }: Props) {
   const addItem = useCartStore((s) => s.addItem);
+  const hasVariants = Array.isArray(product.variants) && product.variants.length > 0;
+  const [selectedVariant, setSelectedVariant] = useState<string>(
+    hasVariants ? product.variants![0] : '',
+  );
+  const [variantOpen, setVariantOpen] = useState(false);
+  const variantRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!variantOpen) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (variantRef.current && !variantRef.current.contains(event.target as Node)) {
+        setVariantOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [variantOpen]);
 
   return (
     <motion.article
@@ -57,12 +77,64 @@ export default function ProductCard({ product }: Props) {
           )}
         </div>
 
+        {hasVariants && (
+          <div className="mt-2 relative" ref={variantRef}>
+            <label className="sr-only" htmlFor={`variant-${product.id}`}>
+              Variant produktu
+            </label>
+            <button
+              id={`variant-${product.id}`}
+              type="button"
+              onClick={() => setVariantOpen((open) => !open)}
+              className="w-full bg-cream border border-anthracite/10 rounded-full px-3 py-1 text-[11px] tracking-widest uppercase text-stone shadow-sm hover:border-anthracite/30 focus:outline-none focus:ring-1 focus:ring-honey/70 focus:border-honey/60 transition-colors flex items-center justify-between gap-2"
+            >
+              <span className="truncate text-left">{selectedVariant || product.variants![0]}</span>
+              <ChevronDown
+                size={12}
+                className={`shrink-0 transition-transform ${variantOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {variantOpen && (
+              <div className="absolute left-0 right-0 mt-1 bg-cream border border-anthracite/10 rounded-xl shadow-lg z-20 overflow-hidden">
+                {product.variants!.map((v) => {
+                  const active = v === selectedVariant;
+                  return (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVariant(v);
+                        setVariantOpen(false);
+                      }}
+                      className={`w-full text-left px-3 py-1.5 text-[11px] tracking-widest uppercase transition-colors ${
+                        active
+                          ? 'bg-anthracite text-cream'
+                          : 'text-stone hover:bg-anthracite/5 hover:text-anthracite'
+                      }`}
+                    >
+                      {v}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
+
         <div className="flex items-center justify-between gap-2">
           <span className="font-serif text-base font-semibold text-anthracite">
             {product.price.toFixed(2).replace('.', ',')} €
           </span>
           <button
-            onClick={() => product.inStock && addItem(product)}
+            onClick={() => {
+              if (!product.inStock) return;
+              const variantToUse =
+                hasVariants && product.variants && product.variants.length > 0
+                  ? selectedVariant || product.variants[0]
+                  : undefined;
+              addItem(product, variantToUse);
+            }}
             disabled={!product.inStock}
             aria-label={`Pridať ${product.name} do košíka`}
             className="flex items-center gap-1.5 px-3 py-1.5 border border-anthracite hover:bg-anthracite hover:text-cream disabled:border-stone/30 disabled:text-stone/40 disabled:cursor-not-allowed text-anthracite text-xs font-medium tracking-wide transition-colors"

@@ -3,7 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { MapPin, ShoppingBag, ChevronRight, AlertCircle, Loader2 } from 'lucide-react';
 import { useCartStore } from '../store/cartStore';
-import { Order, OrderFormData, PacketaPoint } from '../types';
+import { Order, OrderFormData, OrderItem, PacketaPoint } from '../types';
 import { config } from '../config';
 
 const generateVariableSymbol = (): string =>
@@ -142,6 +142,7 @@ export default function CheckoutPage() {
   const [startedAt] = useState(() => Date.now());
   const [captchaToken, setCaptchaToken] = useState<string | null>(null);
   const captchaRef = useRef<HTMLDivElement | null>(null);
+  const turnstileWidgetIdRef = useRef<string | null>(null);
 
   const total = totalPrice();
 
@@ -184,6 +185,18 @@ export default function CheckoutPage() {
     );
   };
 
+  const resetTurnstile = () => {
+    setCaptchaToken(null);
+    const turnstile = (window as any).turnstile;
+    if (turnstile && turnstileWidgetIdRef.current) {
+      try {
+        turnstile.reset(turnstileWidgetIdRef.current);
+      } catch {
+        // ignorujeme chyby pri resete widgetu
+      }
+    }
+  };
+
   // Cloudflare Turnstile načítanie a render
   useEffect(() => {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
@@ -197,7 +210,7 @@ export default function CheckoutPage() {
       const turnstile = (window as any).turnstile;
       if (!turnstile || !captchaRef.current) return;
 
-      turnstile.render(captchaRef.current, {
+      const widgetId = turnstile.render(captchaRef.current, {
         sitekey: siteKey,
         callback: (token: string) => {
           setCaptchaToken(token);
@@ -210,6 +223,7 @@ export default function CheckoutPage() {
           setCaptchaToken(null);
         },
       });
+      turnstileWidgetIdRef.current = widgetId;
     };
 
     const existingScript = document.querySelector(
@@ -222,15 +236,31 @@ export default function CheckoutPage() {
       } else {
         existingScript.addEventListener('load', renderWidget);
       }
-      return;
+      return () => {
+        existingScript.removeEventListener('load', renderWidget);
+        const t = (window as any).turnstile;
+        if (t && turnstileWidgetIdRef.current != null) {
+          t.remove(turnstileWidgetIdRef.current);
+          turnstileWidgetIdRef.current = null;
+        }
+      };
     }
 
     const script = document.createElement('script');
     script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js';
     script.async = true;
     script.defer = true;
-    script.onload = renderWidget;
+    script.addEventListener('load', renderWidget);
     document.head.appendChild(script);
+
+    return () => {
+      script.removeEventListener('load', renderWidget);
+      const t = (window as any).turnstile;
+      if (t && turnstileWidgetIdRef.current != null) {
+        t.remove(turnstileWidgetIdRef.current);
+        turnstileWidgetIdRef.current = null;
+      }
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -262,7 +292,7 @@ export default function CheckoutPage() {
     }
 
     if (!captchaToken) {
-      setSubmitError('Overenie proti spamu bolo neúspešné. Skúste to prosím znova.');
+      setSubmitError('Prosím potvrďte overenie proti spamu.');
       return;
     }
 
@@ -280,19 +310,25 @@ export default function CheckoutPage() {
       // ak sessionStorage zlyhá, len ignorujeme cooldown
     }
 
-    setSubmitting(true);
-    setSubmitError(null);
-
-    const order: Order = {
-      id: `RZT-${Date.now()}`,
-      variableSymbol: generateVariableSymbol(),
-      items,
-      formData: form,
-      totalAmount: total,
-      createdAt: new Date(),
-    };
-
     try {
+      setSubmitting(true);
+      setSubmitError(null);
+
+      const orderItems: OrderItem[] = items.map(({ product, quantity, selectedVariant }) => ({
+        product,
+        quantity,
+        variant: selectedVariant,
+      }));
+
+      const order: Order = {
+        id: `RZT-${Date.now()}`,
+        variableSymbol: generateVariableSymbol(),
+        items: orderItems,
+        formData: form,
+        totalAmount: total,
+        createdAt: new Date(),
+      };
+
       const response = await fetch('/api/order', {
         method: 'POST',
         headers: {
@@ -317,7 +353,6 @@ export default function CheckoutPage() {
           // ignorujeme chybu pri parsovaní
         }
         setSubmitError(message);
-        setSubmitting(false);
         return;
       }
 
@@ -331,7 +366,9 @@ export default function CheckoutPage() {
       navigate('/success', { state: { order } });
     } catch {
       setSubmitError('Nastala chyba pri odosielaní objednávky. Skúste to prosím znova.');
+    } finally {
       setSubmitting(false);
+      resetTurnstile();
     }
   };
 
@@ -512,22 +549,27 @@ export default function CheckoutPage() {
               <h2 className="font-serif text-lg font-semibold text-anthracite">Zhrnutie objednávky</h2>
 
               <ul className="divide-y divide-anthracite/6 space-y-3">
-                {items.map(({ product, quantity }) => (
-                  <li key={product.id} className="flex items-center gap-3 pt-3 first:pt-0">
-                    <img
-                      src={product.images[0]}
-                      alt={product.name}
-                      className="w-14 h-14 object-cover bg-stone/10 flex-shrink-0"
-                    />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-anthracite line-clamp-2 leading-snug">{product.name}</p>
-                      <p className="text-xs text-stone mt-0.5">× {quantity}</p>
-                    </div>
-                    <p className="text-sm font-semibold text-anthracite flex-shrink-0">
-                      {(product.price * quantity).toFixed(2).replace('.', ',')} €
-                    </p>
-                  </li>
-                ))}
+                {items.map(({ product, quantity, selectedVariant }) => {
+                  const displayName = selectedVariant
+                    ? `${product.name} (${selectedVariant})`
+                    : product.name;
+                  return (
+                    <li key={`${product.id}-${selectedVariant ?? 'default'}`} className="flex items-center gap-3 pt-3 first:pt-0">
+                      <img
+                        src={product.images[0]}
+                        alt={product.name}
+                        className="w-14 h-14 object-cover bg-stone/10 flex-shrink-0"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-anthracite line-clamp-2 leading-snug">{displayName}</p>
+                        <p className="text-xs text-stone mt-0.5">× {quantity}</p>
+                      </div>
+                      <p className="text-sm font-semibold text-anthracite flex-shrink-0">
+                        {(product.price * quantity).toFixed(2).replace('.', ',')} €
+                      </p>
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="border-t border-anthracite/8 pt-4 space-y-2">
@@ -541,11 +583,6 @@ export default function CheckoutPage() {
                   <span>Spolu</span>
                   <span>{(total < 40 ? total + 2.9 : total).toFixed(2).replace('.', ',')} €</span>
                 </div>
-                {total < 40 && (
-                  <p className="text-xs text-stone/60">
-                    Chýba ti {(40 - total).toFixed(2).replace('.', ',')} € do dopravy zadarmo.
-                  </p>
-                )}
               </div>
 
               <div className="space-y-3">

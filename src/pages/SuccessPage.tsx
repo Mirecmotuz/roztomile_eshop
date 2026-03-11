@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Copy, ArrowRight, MapPin, Package } from 'lucide-react';
+import QRCode from 'qrcode';
 import { Order } from '../types';
-import { STORE_IBAN } from '../utils/email';
+import { config } from '../config';
 import { fadeUpVariants, staggerContainer } from '../utils/motion';
 
 // Animated SVG checkmark path
@@ -26,59 +27,119 @@ function AnimatedCheck() {
   );
 }
 
-// Pay by Square QR placeholder (SVG)
-function PayBySquarePlaceholder({ vs, amount, iban }: { vs: string; amount: number; iban: string }) {
+const QR_SIZE = 250;
+
+type PayBySquareQRProps = { vs: string; amount: number; iban: string; beneficiaryName: string; orderId?: string };
+
+/**
+ * Zostaví SPD reťazec (Slovak/Czech Payment Document) pre platobný QR kód.
+ * Formát: SPD*1.0*ACC:IBAN*AM:suma*CC:CZK*RN:príjemca*X-VS:vs*
+ * @see https://qr-platba.cz/pro-vyvojare/specifikace-formatu/
+ */
+function buildSpdString({
+  iban,
+  amount,
+  beneficiaryName,
+  vs,
+  currency = 'CZK',
+}: {
+  iban: string;
+  amount: number;
+  beneficiaryName: string;
+  vs: string;
+  currency?: string;
+}): string | null {
+  const normalizedIban = (iban ?? '').replace(/\s/g, '').toUpperCase().trim();
+  if (!normalizedIban) return null;
+
+  const amountStr = Number.isFinite(amount) && amount >= 0 ? amount.toFixed(2) : '0.00';
+  
+  // DÔLEŽITÉ: Odstráň diakritiku! České banky s ňou v RN majú problém.
+  const name = (beneficiaryName || 'Obchod')
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .trim()
+    .slice(0, 35);
+
+  const vsClean = String(vs ?? '').replace(/\D/g, '').slice(0, 10);
+
+  // ZMENA: Namiesto X-VS použi VS. 
+  // Tiež je dôležité dodržať poradie a štruktúru SPD*1.0*
+  const parts = [
+    `ACC:${normalizedIban}`,
+    `AM:${amountStr}`,
+    `CC:${currency}`,
+    `X-VS:${vsClean}`,
+    `MSG:${name}`,
+  ];
+
+  // if (vsClean) {
+  //   parts.push(`VS:${vsClean}`); // Tu bola chyba (X-VS -> VS)
+  // }
+
+  // Na konci nesmie chýbať hviezdička, ak tam pridávaš VS
+  return `SPD*1.0*${parts.join('*')}*`; 
+}
+
+function PayBySquareQR({ vs, amount, iban, beneficiaryName }: PayBySquareQRProps) {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const spdString = useMemo(
+    () =>
+      buildSpdString({
+        iban,
+        amount,
+        beneficiaryName,
+        vs,
+        currency: 'CZK',
+      }),
+    [iban, amount, beneficiaryName, vs],
+  );
+
+  useEffect(() => {
+    if (!spdString || !canvasRef.current) return;
+    console.log("spdString", spdString);
+    QRCode.toCanvas(canvasRef.current, spdString, {
+      width: QR_SIZE,
+      margin: 1,
+      errorCorrectionLevel: 'M',
+    }).catch((err: unknown) => {
+      console.error('[SPD QR] Chyba pri generovaní QR', err);
+    });
+  }, [spdString]);
+
+  const normalizedIban = (iban ?? '').replace(/\s/g, '').trim();
+  const showFallback = !normalizedIban || !spdString;
+
   return (
     <div className="flex flex-col items-center gap-3 p-5 bg-white border border-gray-100 rounded-lg shadow-soft">
-      <svg
-        width="140"
-        height="140"
-        viewBox="0 0 140 140"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        aria-label="Pay by Square QR kód placeholder"
-        className="rounded"
-      >
-        <rect width="140" height="140" fill="#F9FAFB" />
-        {/* Corner squares */}
-        <rect x="10" y="10" width="36" height="36" rx="3" fill="#2C2C2C" />
-        <rect x="16" y="16" width="24" height="24" rx="1" fill="#F9FAFB" />
-        <rect x="20" y="20" width="16" height="16" rx="1" fill="#2C2C2C" />
-
-        <rect x="94" y="10" width="36" height="36" rx="3" fill="#2C2C2C" />
-        <rect x="100" y="16" width="24" height="24" rx="1" fill="#F9FAFB" />
-        <rect x="104" y="20" width="16" height="16" rx="1" fill="#2C2C2C" />
-
-        <rect x="10" y="94" width="36" height="36" rx="3" fill="#2C2C2C" />
-        <rect x="16" y="100" width="24" height="24" rx="1" fill="#F9FAFB" />
-        <rect x="20" y="104" width="16" height="16" rx="1" fill="#2C2C2C" />
-
-        {/* Center pattern dots */}
-        {[55, 62, 69, 76, 83].flatMap((x) =>
-          [55, 62, 69, 76, 83].map((y) => (
-            <rect key={`${x}-${y}`} x={x} y={y} width="5" height="5" rx="1" fill={Math.random() > 0.45 ? '#2C2C2C' : '#F9FAFB'} />
-          ))
-        )}
-
-        {/* Bottom-right fill pattern */}
-        {[94, 101, 108, 115, 122].map((x) =>
-          [94, 101, 108, 115, 122].map((y) => (
-            <rect key={`br-${x}-${y}`} x={x} y={y} width="5" height="5" rx="1" fill={Math.random() > 0.5 ? '#2C2C2C' : '#F9FAFB'} />
-          ))
-        )}
-      </svg>
+      {showFallback ? (
+        <div
+          className="flex items-center justify-center rounded bg-gray-50 text-center"
+          style={{ width: QR_SIZE, height: QR_SIZE }}
+          aria-hidden
+        >
+          <p className="text-xs text-gray-400 px-4 leading-relaxed">
+            QR kód nie je k dispozícii. Použite IBAN, variabilný symbol a sumu v platobných inštrukciách nižšie.
+          </p>
+        </div>
+      ) : (
+        <canvas
+          ref={canvasRef}
+          width={QR_SIZE}
+          height={QR_SIZE}
+          className="rounded"
+          aria-label="Platobný QR kód (SPD) na skenovanie"
+        />
+      )}
 
       <div className="text-center">
-        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Pay by Square</p>
+        <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Platobný QR kód</p>
         <p className="text-xs text-gray-400 mt-0.5">
-          {amount.toFixed(2).replace('.', ',')} € · VS: {vs}
-        </p>
-        <p className="text-[10px] text-gray-300 mt-1 max-w-[160px] leading-snug">
-          QR kód bude generovaný po integrácii platobnej brány
+          {amount.toFixed(2).replace('.', ',')} Kč · VS: {vs}
         </p>
       </div>
 
-      {/* Hidden data for screen readers / copy */}
       <p className="sr-only">IBAN: {iban}, Variabilný symbol: {vs}</p>
     </div>
   );
@@ -101,6 +162,7 @@ export default function SuccessPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const order = location.state?.order as Order | undefined;
+  const STORE_IBAN = config.store.iban;
 
   // Guard: if navigated directly without order state, redirect home
   useEffect(() => {
@@ -169,7 +231,7 @@ export default function SuccessPage() {
               <div>
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Suma na úhradu</p>
                 <p className="text-2xl font-bold text-anthracite">
-                  {grandTotal.toFixed(2).replace('.', ',')} €
+                  {grandTotal.toFixed(2).replace('.', ',')} Kč
                 </p>
               </div>
               <CopyButton value={grandTotal.toFixed(2)} label="sumu" />
@@ -184,10 +246,12 @@ export default function SuccessPage() {
 
         {/* QR + Packeta side by side */}
         <motion.div variants={fadeUpVariants} className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <PayBySquarePlaceholder
+          <PayBySquareQR
             vs={order.variableSymbol}
             amount={grandTotal}
             iban={STORE_IBAN}
+            beneficiaryName={config.store.beneficiaryName}
+            orderId={order.id}
           />
 
           {/* Packeta info */}
@@ -217,21 +281,24 @@ export default function SuccessPage() {
         <motion.div variants={fadeUpVariants} className="w-full bg-white border border-gray-100 rounded-lg shadow-soft p-6 text-left space-y-3">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Objednané položky</h2>
           <ul className="divide-y divide-gray-50">
-            {order.items.map(({ product, quantity }) => (
-              <li key={product.id} className="flex items-center justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
-                <div className="flex items-center gap-3">
-                  <img
-                    src={product.images[0]}
-                    alt={product.name}
-                    className="w-10 h-10 rounded object-cover bg-gray-100 flex-shrink-0"
-                  />
-                  <p className="text-sm text-anthracite">{product.name}</p>
-                </div>
-                <p className="text-sm font-semibold text-anthracite flex-shrink-0">
-                  {quantity} × {product.price.toFixed(2).replace('.', ',')} €
-                </p>
-              </li>
-            ))}
+            {order.items.map(({ product, quantity, variant }) => {
+              const displayName = variant ? `${product.name} (${variant})` : product.name;
+              return (
+                <li key={`${product.id}-${variant ?? 'default'}`} className="flex items-center justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={product.images[0]}
+                      alt={product.name}
+                      className="w-10 h-10 rounded object-cover bg-gray-100 flex-shrink-0"
+                    />
+                    <p className="text-sm text-anthracite">{displayName}</p>
+                  </div>
+                  <p className="text-sm font-semibold text-anthracite flex-shrink-0">
+                    {quantity} × {product.price.toFixed(2).replace('.', ',')} €
+                  </p>
+                </li>
+              );
+            })}
           </ul>
         </motion.div>
 

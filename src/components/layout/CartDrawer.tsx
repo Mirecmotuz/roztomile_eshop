@@ -66,50 +66,58 @@ export default function CartDrawer() {
                 </div>
               ) : (
                 <ul className="space-y-5">
-                  {items.map(({ product, quantity }) => (
-                    <li key={product.id} className="flex gap-4">
-                      <img
-                        src={product.images[0]}
-                        alt={product.name}
-                        className="w-20 h-20 object-cover flex-shrink-0 bg-stone/10"
-                      />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-anthracite leading-snug line-clamp-2">
-                          {product.name}
-                        </p>
-                        <p className="font-serif text-sm text-honey font-semibold mt-1">
-                          {product.price.toFixed(2).replace('.', ',')} €
-                        </p>
-
-                        {/* Quantity controls */}
-                        <div className="flex items-center gap-2 mt-2">
-                          <button
-                            onClick={() => updateQuantity(product.id, quantity - 1)}
-                            aria-label="Znížiť množstvo"
-                            className="w-6 h-6 flex items-center justify-center border border-anthracite/20 text-stone hover:border-anthracite hover:text-anthracite transition-colors"
-                          >
-                            <Minus size={11} />
-                          </button>
-                          <span className="text-sm font-medium w-5 text-center">{quantity}</span>
-                          <button
-                            onClick={() => updateQuantity(product.id, quantity + 1)}
-                            aria-label="Zvýšiť množstvo"
-                            className="w-6 h-6 flex items-center justify-center border border-anthracite/20 text-stone hover:border-anthracite hover:text-anthracite transition-colors"
-                          >
-                            <Plus size={11} />
-                          </button>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => removeItem(product.id)}
-                        aria-label="Odstrániť produkt"
-                        className="flex-shrink-0 self-start p-1 text-stone/40 hover:text-red-400 transition-colors"
+                  {items.map(({ product, quantity, selectedVariant }) => {
+                    const displayName = selectedVariant
+                      ? `${product.name} (${selectedVariant})`
+                      : product.name;
+                    return (
+                      <li
+                        key={`${product.id}-${selectedVariant ?? 'default'}`}
+                        className="flex gap-4"
                       >
-                        <Trash2 size={14} />
-                      </button>
-                    </li>
-                  ))}
+                        <img
+                          src={product.images[0]}
+                          alt={product.name}
+                          className="w-20 h-20 object-cover flex-shrink-0 bg-stone/10"
+                        />
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-anthracite leading-snug line-clamp-2">
+                            {displayName}
+                          </p>
+                          <p className="font-serif text-sm text-honey font-semibold mt-1">
+                            {product.price.toFixed(2).replace('.', ',')} €
+                          </p>
+
+                          {/* Quantity controls */}
+                          <div className="flex items-center gap-2 mt-2">
+                          <button
+                            onClick={() => updateQuantity(product.id, quantity - 1, selectedVariant)}
+                              aria-label="Znížiť množstvo"
+                              className="w-6 h-6 flex items-center justify-center border border-anthracite/20 text-stone hover:border-anthracite hover:text-anthracite transition-colors"
+                            >
+                              <Minus size={11} />
+                            </button>
+                            <span className="text-sm font-medium w-5 text-center">{quantity}</span>
+                          <button
+                            onClick={() => updateQuantity(product.id, quantity + 1, selectedVariant)}
+                              aria-label="Zvýšiť množstvo"
+                              className="w-6 h-6 flex items-center justify-center border border-anthracite/20 text-stone hover:border-anthracite hover:text-anthracite transition-colors"
+                            >
+                              <Plus size={11} />
+                            </button>
+                          </div>
+                        </div>
+
+                        <button
+                          onClick={() => removeItem(product.id, selectedVariant)}
+                          aria-label="Odstrániť produkt"
+                          className="flex-shrink-0 self-start p-1 text-stone/40 hover:text-red-400 transition-colors"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      </li>
+                    );
+                  })}
                 </ul>
               )}
             </div>

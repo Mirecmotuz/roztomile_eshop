@@ -17,11 +17,19 @@ export interface Product {
   inStock: boolean;
   weight?: string;
   burnTime?: string;
+  variants?: string[];
 }
 
 export interface CartItem {
   product: Product;
   quantity: number;
+  selectedVariant?: string;
+}
+
+export interface OrderItem {
+  product: Product;
+  quantity: number;
+  variant?: string;
 }
 
 export interface PacketaPoint {
@@ -42,7 +50,7 @@ export interface OrderFormData {
 export interface Order {
   id: string;
   variableSymbol: string;
-  items: CartItem[];
+  items: OrderItem[];
   formData: OrderFormData;
   totalAmount: number;
   createdAt: Date;

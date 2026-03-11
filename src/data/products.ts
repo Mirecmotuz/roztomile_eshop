@@ -147,6 +147,7 @@ export const products: Product[] = [
     ],
     inStock: true,
     weight: '10 g',
+    variants: ['biela', 'čierna', 'červená', 'žltá', 'zelená', 'modrá', 'fialová', 'oranžová', 'čierna'],
   },
 ];
 

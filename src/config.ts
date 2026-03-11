@@ -8,15 +8,10 @@ const get = (key: string): string => {
 };
 
 export const config = {
-  emailjs: {
-    publicKey:          get('VITE_EMAILJS_PUBLIC_KEY'),
-    serviceId:          get('VITE_EMAILJS_SERVICE_ID'),
-    ownerTemplateId:    get('VITE_EMAILJS_OWNER_TEMPLATE_ID'),
-    customerTemplateId: get('VITE_EMAILJS_CUSTOMER_TEMPLATE_ID'),
-  },
   store: {
-    iban:       get('VITE_STORE_IBAN'),
-    ownerEmail: get('VITE_OWNER_EMAIL'),
+    iban:             get('VITE_STORE_IBAN'),
+    ownerEmail:       get('VITE_OWNER_EMAIL'),
+    beneficiaryName:  get('VITE_STORE_BENEFICIARY_NAME'),
   },
   packeta: {
     apiKey: get('VITE_PACKETA_API_KEY'),
