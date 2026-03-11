@@ -31,11 +31,6 @@ const QR_SIZE = 250;
 
 type PayBySquareQRProps = { vs: string; amount: number; iban: string; beneficiaryName: string; orderId?: string };
 
-/**
- * Zostaví SPD reťazec (Slovak/Czech Payment Document) pre platobný QR kód.
- * Formát: SPD*1.0*ACC:IBAN*AM:suma*CC:CZK*RN:príjemca*X-VS:vs*
- * @see https://qr-platba.cz/pro-vyvojare/specifikace-formatu/
- */
 function buildSpdString({
   iban,
   amount,
@@ -53,8 +48,7 @@ function buildSpdString({
   if (!normalizedIban) return null;
 
   const amountStr = Number.isFinite(amount) && amount >= 0 ? amount.toFixed(2) : '0.00';
-  
-  // DÔLEŽITÉ: Odstráň diakritiku! České banky s ňou v RN majú problém.
+
   const name = (beneficiaryName || 'Obchod')
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "")
@@ -63,8 +57,6 @@ function buildSpdString({
 
   const vsClean = String(vs ?? '').replace(/\D/g, '').slice(0, 10);
 
-  // ZMENA: Namiesto X-VS použi VS. 
-  // Tiež je dôležité dodržať poradie a štruktúru SPD*1.0*
   const parts = [
     `ACC:${normalizedIban}`,
     `AM:${amountStr}`,
@@ -77,7 +69,6 @@ function buildSpdString({
   //   parts.push(`VS:${vsClean}`); // Tu bola chyba (X-VS -> VS)
   // }
 
-  // Na konci nesmie chýbať hviezdička, ak tam pridávaš VS
   return `SPD*1.0*${parts.join('*')}*`; 
 }
 
@@ -189,13 +180,13 @@ export default function SuccessPage() {
 
         {/* Heading */}
         <motion.div variants={fadeUpVariants} className="space-y-2">
-          <h1 className="text-3xl font-bold text-anthracite">Objednávka prijatá!</h1>
+          <h1 className="text-3xl font-bold text-anthracite">Objednávka přijata!</h1>
           <p className="text-gray-500 leading-relaxed max-w-md">
-            Ďakujeme,{' '}
+            Děkujeme,{' '}
             <strong className="text-anthracite">
               {order.formData.firstName} {order.formData.lastName}
             </strong>
-            . Potvrdenie sme zaslali na{' '}
+            . Potvrzení jsme poslali na{' '}
             <strong className="text-anthracite">{order.formData.email}</strong>.
           </p>
           <p className="text-xs text-gray-400">Objednávka č. {order.id}</p>
@@ -203,7 +194,7 @@ export default function SuccessPage() {
 
         {/* Payment instructions */}
         <motion.div variants={fadeUpVariants} className="w-full bg-white border border-gray-100 rounded-lg shadow-soft p-6 space-y-5 text-left">
-          <h2 className="text-base font-semibold text-anthracite text-center">Platobné inštrukcie</h2>
+          <h2 className="text-base font-semibold text-anthracite text-center">Platební instrukce</h2>
 
           <div className="space-y-3">
             {/* IBAN */}
@@ -218,7 +209,7 @@ export default function SuccessPage() {
             {/* Variable symbol */}
             <div className="flex items-center justify-between gap-4 p-3.5 bg-honey-light border border-honey/20">
               <div>
-                <p className="text-xs font-semibold text-honey uppercase tracking-wide mb-0.5">Variabilný symbol</p>
+                <p className="text-xs font-semibold text-honey uppercase tracking-wide mb-0.5">Variabilní symbol</p>
                 <p className="font-serif text-2xl font-bold text-honey tracking-widest">
                   {order.variableSymbol}
                 </p>
@@ -229,7 +220,7 @@ export default function SuccessPage() {
             {/* Amount */}
             <div className="flex items-center justify-between gap-4 p-3.5 bg-gray-50 rounded-md">
               <div>
-                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Suma na úhradu</p>
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-0.5">Částka k úhradě</p>
                 <p className="text-2xl font-bold text-anthracite">
                   {grandTotal.toFixed(2).replace('.', ',')} Kč
                 </p>
@@ -239,8 +230,8 @@ export default function SuccessPage() {
           </div>
 
           <div className="text-xs text-gray-400 bg-amber-50 border border-amber-100 rounded-md p-3 leading-relaxed">
-            <strong className="text-amber-700">Dôležité:</strong> Uveďte prosím variabilný symbol{' '}
-            <strong className="text-amber-700">{order.variableSymbol}</strong> pri platbe. Bez neho nie je možné objednávku spárovať.
+            <strong className="text-amber-700">Důležité:</strong> Uveďte prosím variabilní symbol{' '}
+            <strong className="text-amber-700">{order.variableSymbol}</strong> při platbě. Bez něj není možné objednávku spárovat.
           </div>
         </motion.div>
 
@@ -261,7 +252,7 @@ export default function SuccessPage() {
                 <Package size={26} className="text-honey" />
               </div>
               <div className="text-center">
-                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Výdajné miesto</p>
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Výdejní místo</p>
                 <p className="text-sm font-semibold text-anthracite mt-1">
                   {order.formData.packetaPoint.name}
                 </p>
@@ -270,7 +261,7 @@ export default function SuccessPage() {
                 </p>
                 <div className="flex items-center justify-center gap-1 mt-2 text-xs text-honey">
                   <MapPin size={12} />
-                  <span>Packeta (Zásielkovňa)</span>
+                  <span>Packeta</span>
                 </div>
               </div>
             </div>
@@ -294,7 +285,7 @@ export default function SuccessPage() {
                     <p className="text-sm text-anthracite">{displayName}</p>
                   </div>
                   <p className="text-sm font-semibold text-anthracite flex-shrink-0">
-                    {quantity} × {product.price.toFixed(2).replace('.', ',')} €
+                    {quantity} × {product.price.toFixed(2).replace('.', ',')} Kč
                   </p>
                 </li>
               );
@@ -308,7 +299,7 @@ export default function SuccessPage() {
             to="/"
             className="inline-flex items-center gap-2 px-6 py-3 bg-anthracite hover:bg-anthracite/90 text-cream text-xs font-semibold uppercase tracking-widest transition-colors"
           >
-            Späť do obchodu
+            Zpět do obchodu
             <ArrowRight size={16} />
           </Link>
         </motion.div>

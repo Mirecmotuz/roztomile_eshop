@@ -7,28 +7,28 @@ const slides = [
   {
     id: 1,
     image: 'https://images.unsplash.com/photo-1603905219867-ef465f9c8cd5?w=1600&q=85',
-    tag: 'Jar 2026',
-    heading: 'Veľkonočná\nkolekcia',
-    sub: 'Ručne liate sójové sviečky s vôňou jari. Prírodné, udržateľné, krásne.',
-    cta: 'Objaviť kolekciu',
+    tag: 'Jaro 2026',
+    heading: 'Velikonoční\nkolekce',
+    sub: 'Ručně lité sójové svíčky s vůní jara. Přírodní, udržitelné, krásné.',
+    cta: 'Objevit kolekci',
     to: '/?category=sviečky&focus=products',
   },
   {
     id: 2,
     image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85',
     tag: 'Zero Waste',
-    heading: 'Včelí vosk\nnajlepší priateľ kuchyne',
-    sub: 'Ekologická náhrada plastovej fólie z prírodného včelieho vosku. Vydrží rok.',
-    cta: 'Pozrieť wrappy',
+    heading: 'Včelí vosk\nnejlepší přítel kuchyně',
+    sub: 'Ekologická náhrada plastové fólie z přírodního včelího vosku. Vydrží rok.',
+    cta: 'Prohlédnout wrappy',
     to: '/?category=včelí vosk&focus=products',
   },
   {
     id: 3,
     image: 'https://images.unsplash.com/photo-1586495777744-4e6232bf5e2f?w=1600&q=85',
-    tag: '100 % prírodné',
-    heading: 'Balzamy na pery\nbez kompromisov',
-    sub: 'Len to, čo príroda dala. Žiadny parafín, žiadne silikóny — len čistá starostlivosť.',
-    cta: 'Vybrať balzam',
+    tag: '100 % přírodní',
+    heading: 'Balzámy na rty\nbez kompromisů',
+    sub: 'Jen to, co příroda dala. Žádný parafín, žádné silikony — jen čistá péče.',
+    cta: 'Vybrat balzám',
     to: '/?category=balzamy&focus=products',
   },
 ];
@@ -106,14 +106,14 @@ export default function HeroSlider() {
       {/* Arrows */}
       <button
         onClick={prev}
-        aria-label="Predchádzajúci slide"
+        aria-label="Předchozí snímek"
         className="absolute left-4 top-1/2 -translate-y-1/2 p-2 text-white/60 hover:text-white transition-colors"
       >
         <ChevronLeft size={24} />
       </button>
       <button
         onClick={next}
-        aria-label="Nasledujúci slide"
+        aria-label="Další snímek"
         className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-white/60 hover:text-white transition-colors"
       >
         <ChevronRight size={24} />
@@ -125,7 +125,7 @@ export default function HeroSlider() {
           <button
             key={i}
             onClick={() => setCurrent(i)}
-            aria-label={`Slide ${i + 1}`}
+            aria-label={`Snímek ${i + 1}`}
             className={`transition-all duration-300 ${
               i === current ? 'w-8 h-px bg-white' : 'w-4 h-px bg-white/40 hover:bg-white/70'
             }`}

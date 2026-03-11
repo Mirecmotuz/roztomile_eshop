@@ -52,7 +52,7 @@ function formatItems(order) {
     .map((i) => {
       const variant = i.variant || i.selectedVariant;
       const nameWithVariant = variant ? `${i.product.name} (${variant})` : i.product.name;
-      return `${nameWithVariant} × ${i.quantity} = ${(i.product.price * i.quantity).toFixed(2)} €`;
+      return `${nameWithVariant} × ${i.quantity} = ${(i.product.price * i.quantity).toFixed(2)} Kč`;
     })
     .join('\n');
 }
@@ -73,7 +73,7 @@ function buildCommonParams(order) {
     packeta_point_address: (order.formData.packetaPoint && order.formData.packetaPoint.address) || '—',
     packeta_point_id: (order.formData.packetaPoint && order.formData.packetaPoint.id) || '—',
     iban: STORE_IBAN || '',
-    created_at: createdAt.toLocaleString('sk-SK', {
+    created_at: createdAt.toLocaleString('cs-CZ', {
       dateStyle: 'long',
       timeStyle: 'short',
     }),
@@ -155,24 +155,24 @@ function resetRateLimitStores() {
 async function handler(req, res) {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
-    return json(res, 405, { error: 'Method not allowed' });
+    return json(res, 405, { error: 'Metoda není povolena.' });
   }
 
   try {
     const { order, honeypot, startedAt, captchaToken } = req.body || {};
 
-    // Honeypot: ak pole nie je prázdne, ticho ignorujeme
+    // Honeypot: pokud pole není prázdné, tiše ignorujeme
     if (honeypot && String(honeypot).trim() !== '') {
       return json(res, 200, { success: true, skipped: true });
     }
 
     if (!order || !order.formData || !Array.isArray(order.items)) {
-      return json(res, 400, { error: 'Neplatné dáta objednávky.' });
+      return json(res, 400, { error: 'Neplatná data objednávky.' });
     }
 
     if (!captchaToken || typeof captchaToken !== 'string') {
       return json(res, 400, {
-        error: 'Overenie proti spamu zlyhalo. Skúste formulár odoslať znova.',
+        error: 'Ověření proti spamu selhalo. Zkuste formulář odeslat znovu.',
       });
     }
 
@@ -182,35 +182,35 @@ async function handler(req, res) {
       const ok = await verifyTurnstile(captchaToken, ip);
       if (!ok) {
         return json(res, 403, {
-          error: 'Overenie proti spamu zlyhalo. Skúste formulár odoslať znova.',
+          error: 'Ověření proti spamu selhalo. Zkuste formulář odeslat znovu.',
         });
       }
     } catch (err) {
       console.error('Turnstile verify error:', err);
       return json(res, 503, {
-        error: 'Overenie proti spamu zlyhalo. Skúste to prosím znova.',
+        error: 'Ověření proti spamu selhalo. Zkuste to prosím znovu.',
       });
     }
 
     const now = Date.now();
     if (!startedAt || typeof startedAt !== 'number' || now - startedAt < 3000) {
       return json(res, 400, {
-        error: 'Objednávku sa nepodarilo odoslať. Skúste to prosím znova.',
+        error: 'Objednávku se nepodařilo odeslat. Zkuste to prosím znovu.',
       });
     }
 
-    // Rate-limit podľa IP
+    // Rate-limit podle IP
     if (isRateLimited(ipRequests, ip, IP_WINDOW_MS, IP_MAX_REQUESTS)) {
       return json(res, 429, {
-        error: 'Odosielate objednávky príliš často. Skúste to prosím neskôr.',
+        error: 'Odesíláte objednávky příliš často. Zkuste to prosím později.',
       });
     }
 
-    // Rate-limit podľa emailu
+    // Rate-limit podle e-mailu
     const email = (order.formData.email || '').toLowerCase();
     if (email && isRateLimited(emailRequests, email, EMAIL_WINDOW_MS, EMAIL_MAX_REQUESTS)) {
       return json(res, 429, {
-        error: 'Z tohto e-mailu bolo odoslaných príliš veľa objednávok. Skúste to prosím neskôr.',
+        error: 'Z této e-mailové adresy bylo odesláno příliš mnoho objednávek. Zkuste to prosím později.',
       });
     }
 
@@ -225,7 +225,7 @@ async function handler(req, res) {
   } catch (err) {
     console.error('Order API error:', err);
     return json(res, 500, {
-      error: 'Nastala chyba pri odosielaní objednávky. Skúste to prosím znova.',
+      error: 'Nastala chyba při odesílání objednávky. Zkuste to prosím znovu.',
     });
   }
 }

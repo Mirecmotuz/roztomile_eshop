@@ -155,8 +155,8 @@ export default function CheckoutPage() {
     const packeta = window.Packeta;
     if (!packeta || !packeta.Widget || typeof packeta.Widget.pick !== 'function') return;
 
-    // Pre istotu zatvoríme prípadný predchádzajúci instance widgetu,
-    // aby sa pri ďalšom otvorení nenačítaval v "rozbitom" stave.
+    // Pro jistotu zavřeme případnou předchozí instanci widgetu,
+    // aby se při dalším otevření nenačítal v „rozbitém“ stavu.
     try {
       if (typeof packeta.Widget.close === 'function') {
         packeta.Widget.close();
@@ -177,8 +177,8 @@ export default function CheckoutPage() {
         setField('packetaPoint', selected);
       },
       {
-        language: 'sk',
-        country: 'sk',
+        language: 'cs',
+        country: 'cz',
         webUrl: window.location.origin,
         appIdentity: 'roztomile',
       }
@@ -192,16 +192,16 @@ export default function CheckoutPage() {
       try {
         turnstile.reset(turnstileWidgetIdRef.current);
       } catch {
-        // ignorujeme chyby pri resete widgetu
+        // ignorujeme chyby při resetu widgetu
       }
     }
   };
 
-  // Cloudflare Turnstile načítanie a render
+  // Cloudflare Turnstile načtení a vykreslení
   useEffect(() => {
     const siteKey = import.meta.env.VITE_TURNSTILE_SITE_KEY as string | undefined;
     if (!siteKey) {
-      console.warn('[checkout] Chýba VITE_TURNSTILE_SITE_KEY pre Turnstile.');
+      console.warn('[checkout] Chybí VITE_TURNSTILE_SITE_KEY pro Turnstile.');
       return;
     }
     if (!captchaRef.current) return;
@@ -302,12 +302,12 @@ export default function CheckoutPage() {
       if (lastOrderRaw) {
         const lastOrder = Number(lastOrderRaw);
         if (!Number.isNaN(lastOrder) && Date.now() - lastOrder < ORDER_COOLDOWN_MS) {
-          setSubmitError('Objednávku ste práve odoslali. Skúste to prosím znova o chvíľu.');
+          setSubmitError('Objednávku jste právě odeslali. Zkuste to prosím znovu za chvíli.');
           return;
         }
       }
     } catch {
-      // ak sessionStorage zlyhá, len ignorujeme cooldown
+      // pokud sessionStorage selže, jen ignorujeme cooldown
     }
 
     try {
@@ -343,14 +343,14 @@ export default function CheckoutPage() {
       });
 
       if (!response.ok) {
-        let message = 'Nastala chyba pri odosielaní objednávky. Skúste to prosím znova.';
+        let message = 'Nastala chyba při odesílání objednávky. Zkuste to prosím znovu.';
         try {
           const data = await response.json();
           if (data && typeof data.error === 'string') {
             message = data.error;
           }
         } catch {
-          // ignorujeme chybu pri parsovaní
+          // ignorujeme chybu při parsování
         }
         setSubmitError(message);
         return;
@@ -359,13 +359,13 @@ export default function CheckoutPage() {
       try {
         window.sessionStorage.setItem('lastOrderAt', String(Date.now()));
       } catch {
-        // ignorujeme chybu pri zápise
+        // ignorujeme chybu při zápisu
       }
 
       clearCart();
       navigate('/success', { state: { order } });
     } catch {
-      setSubmitError('Nastala chyba pri odosielaní objednávky. Skúste to prosím znova.');
+      setSubmitError('Nastala chyba při odesílání objednávky. Zkuste to prosím znovu.');
     } finally {
       setSubmitting(false);
       resetTurnstile();
@@ -376,9 +376,9 @@ export default function CheckoutPage() {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center gap-4 text-center px-4">
         <ShoppingBag size={48} className="text-stone/20" />
-        <p className="text-stone">Váš košík je prázdny.</p>
+        <p className="text-stone">Váš košík je prázdný.</p>
         <Link to="/" className="px-5 py-2.5 bg-anthracite text-cream text-xs font-semibold uppercase tracking-widest hover:bg-anthracite/90 transition-colors">
-          Späť do obchodu
+          Zpět do obchodu
         </Link>
       </div>
     );
@@ -388,7 +388,7 @@ export default function CheckoutPage() {
     <main className="max-w-6xl mx-auto px-4 py-12">
       <div className="mb-10">
         <p className="text-[10px] font-semibold uppercase tracking-widest text-honey mb-2">Krok 1 z 1</p>
-        <h1 className="font-serif text-4xl font-semibold text-anthracite">Dokončenie objednávky</h1>
+        <h1 className="font-serif text-4xl font-semibold text-anthracite">Dokončení objednávky</h1>
       </div>
 
       <form onSubmit={handleSubmit} noValidate>
@@ -403,19 +403,19 @@ export default function CheckoutPage() {
           >
             {/* Personal details */}
             <section className="bg-cream border border-anthracite/8 p-6 space-y-5">
-              <h2 className="font-serif text-lg font-semibold text-anthracite">Osobné údaje</h2>
+              <h2 className="font-serif text-lg font-semibold text-anthracite">Osobní údaje</h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <Field
-                  label="Meno"
+                  label="Jméno"
                   id="firstName"
                   value={form.firstName}
                   error={errors.firstName}
                   onChange={(v) => setField('firstName', v)}
-                  placeholder="Ján"
+                  placeholder="Jan"
                 />
                 <Field
-                  label="Priezvisko"
+                  label="Příjmení"
                   id="lastName"
                   value={form.lastName}
                   error={errors.lastName}
@@ -434,7 +434,7 @@ export default function CheckoutPage() {
                 placeholder="jan.novak@email.com"
               />
               <Field
-                label="Telefón"
+                label="Telefon"
                 id="phone"
                 type="tel"
                 value={form.phone}
@@ -444,22 +444,22 @@ export default function CheckoutPage() {
               />
               <div>
                 <label htmlFor="note" className="block text-sm font-medium text-anthracite mb-1.5">
-                  Poznámka k objednávke <span className="text-stone font-normal">(nepovinné)</span>
+                  Poznámka k objednávce <span className="text-stone font-normal">(nepovinné)</span>
                 </label>
                 <textarea
                   id="note"
                   rows={3}
                   value={form.note}
                   onChange={(e) => setField('note', e.target.value)}
-                  placeholder="Napr. darčekové balenie, špeciálna požiadavka..."
+                  placeholder="Např. dárkové balení, speciální požadavek..."
                   className="w-full px-3.5 py-2.5 text-sm border border-anthracite/15 bg-cream resize-none focus:outline-none focus:ring-2 focus:ring-honey/20 focus:border-honey transition-colors"
                 />
               </div>
 
-              {/* Honeypot field pre bota — skryté pre bežného používateľa */}
+              {/* Honeypot field pro bota — skryté pro běžného uživatele */}
               <div className="hidden">
                 <label htmlFor="company" className="text-xs">
-                  Firma (nevypĺňajte)
+                  Firma (nevyplňujte)
                 </label>
                 <input
                   id="company"
@@ -474,12 +474,12 @@ export default function CheckoutPage() {
 
             {/* Packeta */}
             <section className="bg-cream border border-anthracite/8 p-6 space-y-4">
-              <h2 className="font-serif text-lg font-semibold text-anthracite">Spôsob doručenia</h2>
+              <h2 className="font-serif text-lg font-semibold text-anthracite">Způsob doručení</h2>
 
               <div className="flex items-center gap-3 p-4 border border-honey bg-honey-light">
                 <input type="radio" checked readOnly id="packeta" className="accent-brand" />
                 <label htmlFor="packeta" className="text-sm font-medium text-anthracite cursor-pointer">
-                  Packeta (Zásielkovňa) — výdajné miesto
+                  Packeta — výdejní místo
                 </label>
               </div>
 
@@ -508,7 +508,7 @@ export default function CheckoutPage() {
                     className="flex items-center gap-2 px-4 py-2.5 bg-anthracite hover:bg-anthracite/90 disabled:bg-stone/20 disabled:cursor-not-allowed text-cream text-xs font-semibold uppercase tracking-widest transition-colors"
                   >
                     <MapPin size={15} />
-                    {packetaReady ? 'Vybrať odberné miesto' : 'Načítava sa widget…'}
+                    {packetaReady ? 'Vybrat výdejní místo' : 'Načítá se widget…'}
                   </button>
                   {errors.packetaPoint && (
                     <p className="flex items-center gap-1.5 text-xs text-red-500 mt-2">
@@ -525,7 +525,7 @@ export default function CheckoutPage() {
               <div className="flex items-center gap-3 p-4 border border-honey bg-honey-light">
                 <input type="radio" checked readOnly id="bank" className="accent-brand" />
                 <label htmlFor="bank" className="text-sm font-medium text-anthracite">
-                  Bankový prevod — po odoslaní objednávky dostanete IBAN a variabilný symbol
+                  Bankovní převod — po odeslání objednávky obdržíte IBAN a variabilní symbol
                 </label>
               </div>
             </section>
@@ -564,8 +564,8 @@ export default function CheckoutPage() {
                         <p className="text-sm font-medium text-anthracite line-clamp-2 leading-snug">{displayName}</p>
                         <p className="text-xs text-stone mt-0.5">× {quantity}</p>
                       </div>
-                      <p className="text-sm font-semibold text-anthracite flex-shrink-0">
-                        {(product.price * quantity).toFixed(2).replace('.', ',')} €
+                    <p className="text-sm font-semibold text-anthracite flex-shrink-0">
+                      {(product.price * quantity).toFixed(2).replace('.', ',')} Kč
                       </p>
                     </li>
                   );
@@ -576,12 +576,12 @@ export default function CheckoutPage() {
                 <div className="flex justify-between text-sm text-stone">
                   <span>Doprava (Packeta)</span>
                   <span className="font-medium text-anthracite">
-                    {total >= 40 ? 'Zadarmo' : '2,90 €'}
+                    {total >= 40 ? 'Zdarma' : '2,90 Kč'}
                   </span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-anthracite">
-                  <span>Spolu</span>
-                  <span>{(total < 40 ? total + 2.9 : total).toFixed(2).replace('.', ',')} €</span>
+                  <span>Celkem</span>
+                  <span>{(total < 40 ? total + 2.9 : total).toFixed(2).replace('.', ',')} Kč</span>
                 </div>
               </div>
 
@@ -601,19 +601,19 @@ export default function CheckoutPage() {
                 {submitting ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    Odosielam…
+                    Odesílám…
                   </>
                 ) : (
                   <>
-                    Odoslať objednávku
+                    Odeslat objednávku
                     <ChevronRight size={16} />
                   </>
                 )}
               </button>
 
               <p className="text-xs text-stone/60 text-center leading-relaxed">
-                Odoslaním objednávky súhlasíte s{' '}
-                <Link to="/terms" className="text-honey hover:underline">obchodnými podmienkami</Link>.
+                Odesláním objednávky souhlasíte s{' '}
+                <Link to="/terms" className="text-honey hover:underline">obchodními podmínkami</Link>.
               </p>
               </div>
             </div>

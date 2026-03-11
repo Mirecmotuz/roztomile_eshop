@@ -124,7 +124,7 @@ export default function ProductCard({ product }: Props) {
 
         <div className="flex items-center justify-between gap-2">
           <span className="font-serif text-base font-semibold text-anthracite">
-            {product.price.toFixed(2).replace('.', ',')} €
+            {product.price.toFixed(2).replace('.', ',')} Kč
           </span>
           <button
             onClick={() => {

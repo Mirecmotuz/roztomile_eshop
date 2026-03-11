@@ -4,9 +4,9 @@ import { ShoppingBag, Search, Menu, X } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
 
 const navLinks = [
-  { to: '/', label: 'E-shop' },
-  { to: '/our-story', label: 'Náš príbeh' },
-  { to: '/care', label: 'Starostlivosť' },
+  { to: '/', label: 'E‑shop' },
+  { to: '/our-story', label: 'Náš příběh' },
+  { to: '/care', label: 'Péče' },
 ];
 
 export default function Header() {
@@ -57,7 +57,7 @@ export default function Header() {
           {/* Icons */}
           <div className="flex items-center gap-2">
             <button
-              aria-label="Vyhľadávanie"
+              aria-label="Vyhledávání"
               className="p-2 text-anthracite/60 hover:text-anthracite transition-colors"
               onClick={() => {
                 navigate('/?focus=search');
@@ -69,7 +69,7 @@ export default function Header() {
 
             <button
               onClick={toggleCart}
-              aria-label={`Košík (${itemCount} položiek)`}
+              aria-label={`Košík (${itemCount} položek)`}
               className="relative p-2 text-anthracite/60 hover:text-anthracite transition-colors"
             >
               <ShoppingBag size={18} />

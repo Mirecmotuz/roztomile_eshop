@@ -56,12 +56,12 @@ export default function CartDrawer() {
               {items.length === 0 ? (
                 <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
                   <ShoppingBag size={40} className="text-stone/20" />
-                  <p className="text-stone text-sm">Váš košík je prázdny.</p>
+                  <p className="text-stone text-sm">Váš košík je prázdný.</p>
                   <button
                     onClick={closeCart}
                     className="text-xs font-medium uppercase tracking-widest text-honey hover:underline"
                   >
-                    Pokračovať v nákupe →
+                    Pokračovat v nákupu →
                   </button>
                 </div>
               ) : (
@@ -85,7 +85,7 @@ export default function CartDrawer() {
                             {displayName}
                           </p>
                           <p className="font-serif text-sm text-honey font-semibold mt-1">
-                            {product.price.toFixed(2).replace('.', ',')} €
+                            {product.price.toFixed(2).replace('.', ',')} Kč
                           </p>
 
                           {/* Quantity controls */}
@@ -128,22 +128,22 @@ export default function CartDrawer() {
                 <div className="flex items-center justify-between">
                   <span className="text-xs uppercase tracking-widest text-stone">Spolu</span>
                   <span className="font-serif text-xl font-semibold text-anthracite">
-                    {total.toFixed(2).replace('.', ',')} €
+                    {total.toFixed(2).replace('.', ',')} Kč
                   </span>
                 </div>
-                <p className="text-xs text-stone/60">Doprava a Packeta výdajné miesto zvolíte pri objednávke.</p>
+                <p className="text-xs text-stone/60">Dopravu a výdejní místo Packeta zvolíte při objednávce.</p>
                 <Link
                   to="/checkout"
                   onClick={closeCart}
                   className="block w-full text-center py-3 bg-anthracite hover:bg-anthracite/90 text-cream text-xs font-semibold uppercase tracking-widest transition-colors"
                 >
-                  Prejsť na pokladňu
+                  Přejít k pokladně
                 </Link>
                 <button
                   onClick={closeCart}
                   className="block w-full text-center py-2 text-xs uppercase tracking-widest text-stone hover:text-anthracite transition-colors"
                 >
-                  Pokračovať v nákupe
+                  Pokračovat v nákupu
                 </button>
               </div>
             )}

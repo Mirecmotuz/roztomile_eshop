@@ -4,15 +4,15 @@ import { Instagram, Facebook, Mail, MapPin, Phone, ArrowRight } from 'lucide-rea
 import { config } from '../../config';
 
 const quickLinks = [
-  { to: '/', label: 'E-shop' },
-  { to: '/our-story', label: 'Náš príbeh' },
-  { to: '/care', label: 'Starostlivosť' },
+  { to: '/', label: 'E‑shop' },
+  { to: '/our-story', label: 'Náš příběh' },
+  { to: '/care', label: 'Péče' },
 ];
 
 const categories = [
-  { to: '/?category=sviečky&focus=products', label: 'Sviečky' },
+  { to: '/?category=sviečky&focus=products', label: 'Svíčky' },
   { to: '/?category=včelí vosk&focus=products', label: 'Včelí vosk' },
-  { to: '/?category=balzamy&focus=products', label: 'Balzamy na pery' },
+  { to: '/?category=balzamy&focus=products', label: 'Balzámy na rty' },
 ];
 
 export default function Footer() {
@@ -40,7 +40,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-cream/60">
-              Ručne vyrábané sviečky, včelí vosk a prírodná kozmetika s láskou pre váš domov. Každý kúsok vzniká v malom ateliéri.
+              Ručně vyráběné svíčky, včelí vosk a přírodní kosmetika s láskou pro váš domov. Každý kousek vzniká v malém ateliéru.
             </p>
             <div className="flex items-center gap-3 pt-1">
               <a
@@ -67,7 +67,7 @@ export default function Footer() {
           {/* Column 2 — Quick links */}
           <div className="space-y-4">
             <h4 className="text-[10px] font-semibold text-cream/40 uppercase tracking-widest">
-              Navigácia
+              Navigace
             </h4>
             <ul className="space-y-2.5">
               {quickLinks.map(({ to, label }) => (
@@ -79,7 +79,7 @@ export default function Footer() {
               ))}
             </ul>
             <h4 className="text-[10px] font-semibold text-cream/40 uppercase tracking-widest pt-2">
-              Kategórie
+              Kategorie
             </h4>
             <ul className="space-y-2.5">
               {categories.map(({ to, label }) => (
@@ -118,7 +118,7 @@ export default function Footer() {
               </li>
               <li className="flex items-start gap-2.5 text-sm text-cream/60">
                 <MapPin size={14} className="mt-0.5 flex-shrink-0" />
-                <span>Slovenská republika</span>
+                <span>Česká republika</span>
               </li>
             </ul>
           </div>
@@ -129,11 +129,11 @@ export default function Footer() {
               Newsletter
             </h4>
             <p className="text-sm text-cream/60 leading-relaxed">
-              Prihláste sa a ako prvý zistíte o nových produktoch a sezónnych kolekciách.
+              Přihlaste se a jako první se dozvíte o nových produktech a sezónních kolekcích.
             </p>
             {subscribed ? (
               <p className="text-sm font-medium text-honey">
-                Ďakujeme za prihlásenie.
+                Děkujeme za přihlášení.
               </p>
             ) : (
               <form onSubmit={handleSubscribe} className="flex gap-2">
@@ -141,7 +141,7 @@ export default function Footer() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Váš e-mail"
+                  placeholder="Váš e‑mail"
                   required
                   className="flex-1 min-w-0 px-3 py-2 text-sm bg-transparent border border-cream/20 text-cream placeholder-cream/30 focus:outline-none focus:border-honey transition-colors"
                 />
@@ -161,8 +161,8 @@ export default function Footer() {
         <div className="mt-12 pt-6 border-t border-cream/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-cream/30 uppercase tracking-widest">
           <p>© {new Date().getFullYear()} Roztomile</p>
           <div className="flex gap-6">
-            <Link to="/privacy" className="hover:text-honey transition-colors">Ochrana súkromia</Link>
-            <Link to="/terms" className="hover:text-honey transition-colors">Obchodné podmienky</Link>
+            <Link to="/privacy" className="hover:text-honey transition-colors">Ochrana soukromí</Link>
+            <Link to="/terms" className="hover:text-honey transition-colors">Obchodní podmínky</Link>
           </div>
         </div>
       </div>

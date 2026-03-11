@@ -121,7 +121,7 @@ export default function ProductDetail() {
             </p>
             <h1 className="font-serif text-4xl font-semibold text-anthracite leading-tight">{product.name}</h1>
             <p className="font-serif text-3xl font-semibold text-anthracite mt-4">
-              {product.price.toFixed(2).replace('.', ',')} €
+              {product.price.toFixed(2).replace('.', ',')} Kč
             </p>
             {hasVariants && (
               <div className="mt-4 max-w-xs relative" ref={variantRef}>

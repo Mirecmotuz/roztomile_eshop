@@ -4,37 +4,37 @@ import { Flame, Droplets, Leaf } from 'lucide-react';
 const sections = [
   {
     icon: <Flame size={20} />,
-    title: 'Starostlivosť o sviečky',
+    title: 'Péče o svíčky',
     color: 'honey',
     tips: [
-      'Prvé zapálenie nechajte horieť aspoň 2 hodiny, kým sa celý povrch vosku roztopí.',
-      'Knôt pred každým zapálením skráťte na cca 5 mm — predĺžite tým životnosť sviečky.',
-      'Nikdy neskladujte sviečku na priamom slnku — vosk môže zmäknúť a stratiť tvar.',
-      'Nenechávajte sviečku horieť dlhšie ako 4 hodiny naraz.',
-      'Pred sfúknutím použite viečko alebo záhasník — zabránite dymeniu.',
+      'Při prvním zapálení nechte svíčku hořet alespoň 2 hodiny, dokud se neroztopí celý povrch vosku.',
+      'Knot před každým zapálením zkraťte na cca 5 mm — prodloužíte tak životnost svíčky.',
+      'Nikdy neskladujte svíčku na přímém slunci — vosk může změknout a ztratit tvar.',
+      'Nenechávejte svíčku hořet déle než 4 hodiny v kuse.',
+      'Před sfouknutím použijte víčko nebo zhášedlo — zabráníte kouři.',
     ],
   },
   {
     icon: <Leaf size={20} />,
-    title: 'Starostlivosť o včelí vosk',
+    title: 'Péče o včelí vosk',
     color: 'stone',
     tips: [
-      'Oplachujte vždy studenou vodou — horúca voda vosk roztopí.',
-      'Nepoužívajte na mäso, ryby ani horúce jedlá.',
-      'Po umytí nechajte vyschnúť vo vzduchu — nie v sušičke.',
-      'Skladujte pri izbovej teplote, mimo radiátorov a slnka.',
-      'Pri bežnom používaní vydrží plátienka 1 rok — potom ho skompostujte.',
+      'Oplachujte vždy studenou vodou — horká voda vosk roztaví.',
+      'Nepoužívejte na maso, ryby ani horká jídla.',
+      'Po umytí nechte uschnout na vzduchu — ne v sušičce.',
+      'Skladujte při pokojové teplotě, mimo radiátorů a slunce.',
+      'Při běžném používání vydrží plátýnko 1 rok — poté ho zkompostujte.',
     ],
   },
   {
     icon: <Droplets size={20} />,
-    title: 'Starostlivosť o balzamy',
+    title: 'Péče o balzámy',
     color: 'rose',
     tips: [
-      'Nanášajte čistým prstom alebo priamo tyčinkou — predíde kontaminácii.',
-      'Skladujte na chladnom mieste, nie v kabelke na slnku.',
-      'Spotrebujte do 12 mesiacov od otvorenia.',
-      'V lete môže balzam zmäknúť — jednoducho ho dajte na chvíľu do chladničky.',
+      'Nanášejte čistým prstem nebo přímo tyčinkou — předejdete kontaminaci.',
+      'Skladujte na chladném místě, ne v kabelce na slunci.',
+      'Spotřebujte do 12 měsíců od otevření.',
+      'V létě může balzám změknout — jednoduše ho dejte na chvíli do lednice.',
     ],
   },
 ];
@@ -54,10 +54,10 @@ export default function CarePage() {
         transition={{ duration: 0.5 }}
         className="text-center space-y-4"
       >
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-honey">Návod na použitie</p>
-        <h1 className="font-serif text-4xl font-semibold text-anthracite">Starostlivosť o produkty</h1>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-honey">Návod k použití</p>
+        <h1 className="font-serif text-4xl font-semibold text-anthracite">Péče o produkty</h1>
         <p className="text-stone max-w-xl mx-auto leading-relaxed">
-          Prírodné produkty sa správajú inak ako syntetické. Zopár jednoduchých návykov predĺži ich životnosť a zachová všetky ich vlastnosti.
+          Přírodní produkty se chovají jinak než syntetické. Několik jednoduchých návyků prodlouží jejich životnost a zachová všechny jejich vlastnosti.
         </p>
       </motion.div>
 

@@ -6,17 +6,17 @@ import { products } from '../data/products';
 import { ProductCategory } from '../types';
 
 const categories: { value: ProductCategory | 'all'; label: string }[] = [
-  { value: 'all', label: 'Všetky' },
-  { value: 'sviečky', label: 'Sviečky' },
+  { value: 'all', label: 'Všechny' },
+  { value: 'sviečky', label: 'Svíčky' },
   { value: 'včelí vosk', label: 'Včelí vosk' },
-  { value: 'balzamy', label: 'Balzamy' },
+  { value: 'balzamy', label: 'Balzámy' },
 ];
 
 const sortOptions = [
-  { value: 'default', label: 'Odporúčané' },
-  { value: 'price-asc', label: 'Cena: od najnižšej' },
-  { value: 'price-desc', label: 'Cena: od najvyššej' },
-  { value: 'name', label: 'Podľa názvu' },
+  { value: 'default', label: 'Doporučené' },
+  { value: 'price-asc', label: 'Cena: od nejnižší' },
+  { value: 'price-desc', label: 'Cena: od nejvyšší' },
+  { value: 'name', label: 'Podle názvu' },
 ];
 
 const normalizeText = (text: string) =>
@@ -36,7 +36,7 @@ export default function ProductGrid() {
 
   const activeCategory = (searchParams.get('category') ?? 'all') as ProductCategory | 'all';
   const focusTarget = searchParams.get('focus');
-  const activeSortLabel = sortOptions.find((o) => o.value === sort)?.label ?? 'Odporúčané';
+  const activeSortLabel = sortOptions.find((o) => o.value === sort)?.label ?? 'Doporučené';
 
   useEffect(() => {
     const urlQuery = searchParams.get('q') ?? '';
@@ -109,7 +109,7 @@ export default function ProductGrid() {
 
     if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
     if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
-    if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'sk'));
+    if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'cs'));
     return list;
   }, [activeCategory, sort, search]);
 
@@ -138,8 +138,8 @@ export default function ProductGrid() {
     <section ref={sectionRef} className="max-w-7xl mx-auto px-4 py-16">
       {/* Section header */}
       <div className="mb-10">
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-honey mb-3">Náš sortiment</p>
-        <h2 className="font-serif text-4xl text-anthracite">Ručne vyrobené s láskou</h2>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-honey mb-3">Nabídka produktů</p>
+        <h2 className="font-serif text-4xl text-anthracite">Ručně vyrobené s láskou</h2>
       </div>
 
       {/* Filters bar */}
@@ -170,14 +170,14 @@ export default function ProductGrid() {
               type="text"
               value={search}
               onChange={(e) => updateSearch(e.target.value)}
-              placeholder="Hľadať produkt…"
+              placeholder="Hledat produkt…"
               className="w-full px-4 py-2 text-xs rounded-full border border-anthracite/10 bg-cream text-anthracite placeholder:text-stone/60 focus:outline-none focus:ring-1 focus:ring-honey/70 focus:border-honey/60"
             />
             {search && (
               <button
                 type="button"
                 onClick={() => updateSearch('')}
-                aria-label="Vyčistiť vyhľadávanie"
+                aria-label="Vyčistit vyhledávání"
                 className="absolute inset-y-0 right-2 flex items-center text-stone/60 hover:text-anthracite transition-colors"
               >
                 <X size={14} />
@@ -226,8 +226,8 @@ export default function ProductGrid() {
       {filtered.length === 0 ? (
         <p className="text-stone text-sm py-12 text-center">
           {search.trim()
-            ? <>Nenašli sme žiadny produkt pre „{search.trim()}“. Skúste iné slovo alebo zrušte filtre.</>
-            : 'Žiadne produkty v tejto kategórii.'}
+            ? <>Nenašli jsme žádný produkt pro „{search.trim()}“. Zkuste jiné slovo nebo zrušte filtry.</>
+            : 'Žádné produkty v této kategorii.'}
         </p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
@@ -237,7 +237,7 @@ export default function ProductGrid() {
         </div>
       )}
 
-      <p className="text-xs text-stone/60 mt-10 text-center uppercase tracking-widest">{filtered.length} produktov</p>
+      <p className="text-xs text-stone/60 mt-10 text-center uppercase tracking-widest">{filtered.length} produktů</p>
     </section>
   );
 }

@@ -4,18 +4,18 @@ import { Leaf, Heart, Package } from 'lucide-react';
 const values = [
   {
     icon: <Leaf size={22} />,
-    title: 'Prírodné suroviny',
-    text: 'Používame výhradne prírodné ingrediencie — sójový vosk, včelí vosk, éterické oleje a organické bylinky. Žiadna chémia, žiadne skratky.',
+    title: 'Přírodní suroviny',
+    text: 'Používáme výhradně přírodní ingredience — sójový vosk, včelí vosk, éterické oleje a organické bylinky. Žádná chemie, žádné zkratky.',
   },
   {
     icon: <Heart size={22} />,
     title: 'Ručná výroba',
-    text: 'Každý kúsok vzniká v malom domácom ateliéri. Liate sviečky, šité plátienka, miešané balzamy — s rukami a srdcom.',
+    text: 'Každý kousek vzniká v malém domácím ateliéru. Lité svíčky, šitá plátýnka, míchané balzámy — s rukama a srdcem.',
   },
   {
     icon: <Package size={22} />,
-    title: 'Udržateľné balenie',
-    text: 'Balíme do recyklovateľných materiálov. Bez plastových obalov, bez zbytočného odpadu — len to, čo je skutočne potrebné.',
+    title: 'Udržitelné balení',
+    text: 'Balíme do recyklovatelných materiálů. Bez plastových obalů, bez zbytečného odpadu — jen to, co je skutečně potřeba.',
   },
 ];
 
@@ -29,12 +29,12 @@ export default function OurStoryPage() {
         transition={{ duration: 0.55, ease: 'easeOut' }}
         className="text-center space-y-6"
       >
-        <p className="text-[10px] font-semibold uppercase tracking-widest text-honey">Náš príbeh</p>
+        <p className="text-[10px] font-semibold uppercase tracking-widest text-honey">Náš příběh</p>
         <h1 className="font-serif text-5xl sm:text-6xl font-semibold text-anthracite leading-tight">
-          Vzniklo to z lásky<br />k prírodným vecem
+          Vzniklo to z lásky<br />k přírodním věcem
         </h1>
         <p className="text-stone text-lg leading-relaxed max-w-2xl mx-auto">
-          Roztomile začalo ako malý projekt v kuchyni — s hrncom vosku, pár knôtmi a veľkou chuťou robiť veci inak. Dnes každý kúsok stále vzniká rovnako: ručne, s pozornosťou a bez zbytočnej chémie.
+          Roztomile začalo jako malý projekt v kuchyni — s hrncem vosku, pár knoty a velkou chutí dělat věci jinak. Dnes každý kousek stále vzniká stejně: ručně, s pozorností a bez zbytečné chemie.
         </p>
       </motion.section>
 
@@ -56,7 +56,7 @@ export default function OurStoryPage() {
       {/* Values */}
       <section className="space-y-8">
         <div className="text-center">
-          <p className="text-[10px] font-semibold uppercase tracking-widest text-honey mb-3">Čo nás definuje</p>
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-honey mb-3">Co nás definuje</p>
           <h2 className="font-serif text-4xl text-anthracite">Naše hodnoty</h2>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -88,9 +88,9 @@ export default function OurStoryPage() {
         className="border-l-2 border-honey pl-6 py-2 max-w-2xl mx-auto"
       >
         <p className="font-serif text-2xl font-medium text-anthracite leading-relaxed italic">
-          "Chcem, aby každý kúsok z Roztomile bol malou radosťou v každodennom živote."
+          "Chci, aby každý kousek z Roztomile byl malou radostí v každodenním životě."
         </p>
-        <footer className="mt-3 text-xs uppercase tracking-widest text-stone">— Zakladateľka Roztomile</footer>
+        <footer className="mt-3 text-xs uppercase tracking-widest text-stone">— Zakladatelka Roztomile</footer>
       </motion.blockquote>
     </main>
   );

@@ -3,15 +3,15 @@ import { Product } from '../types';
 export const products: Product[] = [
   {
     id: '1',
-    name: 'Veľkonočná sviečka — Jarná lúka',
+    name: 'Velikonoční svíčka — Jarní louka',
     slug: 'velkonocna-sviecka-jarna-luka',
     price: 14.90,
     category: 'sviečky',
-    shortDescription: 'Ručne liata sójová sviečka s vôňou čerstvých kvetov a trávy.',
+    shortDescription: 'Ručně litá sójová svíčka s vůní čerstvých květů a trávy.',
     description:
-      'Táto veľkonočná sviečka je ručne liata zo 100 % prírodného sójového vosku. Vôňa jemnej jarnej lúky prinesie do vášho domova pocit svežosti a obnovy. Ideálny darček na Veľkú noc alebo radosť pre seba.',
-    scent: 'Jar, zelené stonky, biely kvet, jemná zemina',
-    materials: '100 % sójový vosk, bavlnený knôt, prírodné éterické oleje',
+      'Tato velikonoční svíčka je ručně litá ze 100 % přírodního sójového vosku. Vůně jemné jarní louky přinese do vašeho domova pocit svěžesti a obnovy. Ideální dárek k Velikonocům nebo radost pro sebe.',
+    scent: 'Jaro, zelené stonky, bílý květ, jemná zemina',
+    materials: '100 % sójový vosk, bavlněný knot, přírodní éterické oleje',
     badge: 'Novinka',
     images: [
       'https://images.unsplash.com/photo-1603905219867-ef465f9c8cd5?w=600&q=80',
@@ -23,15 +23,15 @@ export const products: Product[] = [
   },
   {
     id: '2',
-    name: 'Veľkonočná sviečka — Vanilka & Tonka',
+    name: 'Velikonoční svíčka — Vanilka & Tonka',
     slug: 'velkonocna-sviecka-vanilka-tonka',
     price: 14.90,
     category: 'sviečky',
-    shortDescription: 'Teplá a zmyselná vôňa vanilky s hrejivým tónom tonky.',
+    shortDescription: 'Teplá a smyslná vůně vanilky s hřejivým tónem tonky.',
     description:
-      'Luxusná sviečka s bohatou kombináciou madagaskarskej vanilky a vzácneho tonkového bôbu. Hrejivý, sladký aróma vytvára útulnú atmosféru počas veľkonočných sviatkov. Ručne liata v malom množstve.',
-    scent: 'Madagaskarská vanilka, tonkový bôb, santalové drevo',
-    materials: '100 % sójový vosk, bavlnený knôt, parfumérske éterické oleje',
+      'Luxusní svíčka s bohatou kombinací madagaskarské vanilky a vzácného tonkového bobu. Hřejivá, sladká vůně vytváří útulnou atmosféru během velikonočních svátků. Ručně litá v malém množství.',
+    scent: 'Madagaskarská vanilka, tonkový bob, santalové dřevo',
+    materials: '100 % sójový vosk, bavlněný knot, parfémové éterické oleje',
     badge: 'Bestseller',
     images: [
       'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=600&q=80',
@@ -43,15 +43,15 @@ export const products: Product[] = [
   },
   {
     id: '3',
-    name: 'Veľkonočná sviečka — Levanduľa & Eukalyptus',
+    name: 'Velikonoční svíčka — Levandule & Eukalyptus',
     slug: 'velkonocna-sviecka-lavender-eukalyptus',
     price: 16.50,
     category: 'sviečky',
-    shortDescription: 'Upokojujúca kombinácia levandule a čerstvého eukalyptu.',
+    shortDescription: 'Uklidňující kombinace levandule a čerstvého eukalyptu.',
     description:
-      'Prírodná sójová sviečka s bylinkovou vôňou levanduľových polí a ostrým, čerstvým eukalyptom. Perfektná do kúpeľne alebo spálne ako relaxačný rituál. Ručne vyrobená s láskou.',
-    scent: 'Pravá levanduľa, eukalyptus, mäta, čerstvý vzduch',
-    materials: '100 % sójový vosk, bavlnený knôt, prírodné éterické oleje',
+      'Přírodní sójová svíčka s bylinkovou vůní levandulových polí a ostrým, čerstvým eukalyptem. Perfektní do koupelny nebo ložnice jako relaxační rituál. Ručně vyrobená s láskou.',
+    scent: 'Pravá levandule, eukalyptus, máta, čerstvý vzduch',
+    materials: '100 % sójový vosk, bavlněný knot, přírodní éterické oleje',
     images: [
       'https://images.unsplash.com/photo-1608571423539-e951cb2b69b5?w=600&q=80',
       'https://images.unsplash.com/photo-1608571423539-e951cb2b69b5?w=600&q=80',
@@ -66,10 +66,10 @@ export const products: Product[] = [
     slug: 'vcelaci-vosk-wrap-small',
     price: 9.90,
     category: 'včelí vosk',
-    shortDescription: 'Ekologická alternatíva k potravinovej fólii z prírodného včelieho vosku.',
+    shortDescription: 'Ekologická alternativa k potravinové fólii z přírodního včelího vosku.',
     description:
-      'Sada troch malých voskovaných plátienok (veľkosť S) ako udržateľná náhrada za plastikovú potravinovú fóliu. Prírodný včelí vosk, jojobový olej a živica stromu pinia zaručujú pevné uzavretie potravín. Prateľné studenou vodou, vydrží 1 rok.',
-    materials: 'Organická bavlna, včelí vosk, jojobový olej, živica pinie',
+      'Sada tří malých voskovaných plátýnek (velikost S) jako udržitelná náhrada za plastovou potravinovou fólii. Přírodní včelí vosk, jojobový olej a pryskyřice stromu pinie zaručují pevné uzavření potravin. Pratelné ve studené vodě, vydrží 1 rok.',
+    materials: 'Organická bavlna, včelí vosk, jojobový olej, pryskyřice pinie',
     badge: 'Bestseller',
     images: [
       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
@@ -83,10 +83,10 @@ export const products: Product[] = [
     slug: 'vcelaci-vosk-wrap-medium',
     price: 11.90,
     category: 'včelí vosk',
-    shortDescription: 'Stredne veľké voskované plátienka pre zeleninu a ovocie.',
+    shortDescription: 'Středně velká voskovaná plátýnka pro zeleninu a ovoce.',
     description:
-      'Sada troch voskovaných plátienok veľkosti M. Ideálne na zabalenie syrov, zeleniny, chleba alebo misiek. Teplo rúk aktivuje vosk, ktorý sa pevne pritlačí na povrch. 100 % prírodné, kompostovateľné.',
-    materials: 'Organická bavlna, včelí vosk, jojobový olej, živica pinie',
+      'Sada tří voskovaných plátýnek velikosti M. Ideální na zabalení sýrů, zeleniny, chleba nebo misek. Teplo rukou aktivuje vosk, který se pevně přitiskne k povrchu. 100 % přírodní, kompostovatelné.',
+    materials: 'Organická bavlna, včelí vosk, jojobový olej, pryskyřice pinie',
     images: [
       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
@@ -99,10 +99,10 @@ export const products: Product[] = [
     slug: 'vcelaci-vosk-wrap-large',
     price: 11.90,
     category: 'včelí vosk',
-    shortDescription: 'Veľké voskované plátienka na celé bochníky chleba a misky.',
+    shortDescription: 'Velká voskovaná plátýnka na celé bochníky chleba a mísy.',
     description:
-      'Dve veľké voskované plátienka (veľkosť L) — ideálne na zabalenie väčšej zeleniny, celého bochníka chleba alebo na prikrytie misy. Šetrné k planéte, krásny dizajn s ručnou potlačou.',
-    materials: 'Organická bavlna, včelí vosk, jojobový olej, živica pinie',
+      'Dvě velká voskovaná plátýnka (velikost L) — ideální na zabalení větší zeleniny, celého bochníku chleba nebo na přikrytí mísy. Šetrné k planetě, krásný design s ručním potiskem.',
+    materials: 'Organická bavlna, včelí vosk, jojobový olej, pryskyřice pinie',
     badge: 'Novinka',
     images: [
       'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
@@ -112,15 +112,15 @@ export const products: Product[] = [
   },
   {
     id: '7',
-    name: 'Prírodný balzam na pery — Ružové lístky',
+    name: 'Přírodní balzám na rty — Růžové lístky',
     slug: 'balzam-pery-ruzove-listky',
     price: 5.90,
     category: 'balzamy',
-    shortDescription: 'Jemný výživný balzam s vôňou čerstvých ruží a mandľovým olejom.',
+    shortDescription: 'Jemný výživný balzám s vůní čerstvých růží a mandlovým olejem.',
     description:
-      'Intenzívne vyživujúci balzam na pery bez syntetických prísad. Kombinácia rakytníkového oleja, shea masla a ružovej vody poskytuje dlhotrvajúcu hydratáciu. Jemná ružová vôňa robí každé použitie príjemným rituálom.',
-    scent: 'Ružová voda, sladká manduľa, jemná vanilka',
-    materials: 'Včelí vosk, shea maslo, mandľový olej, rakytníkový olej, ružová voda, vitamín E',
+      'Intenzivně vyživující balzám na rty bez syntetických přísad. Kombinace rakytníkového oleje, bambuckého másla a růžové vody poskytuje dlouhotrvající hydrataci. Jemná růžová vůně dělá z každého použití příjemný rituál.',
+    scent: 'Růžová voda, sladká mandle, jemná vanilka',
+    materials: 'Včelí vosk, bambucké máslo, mandlový olej, rakytníkový olej, růžová voda, vitamín E',
     badge: 'Bestseller',
     images: [
       'https://images.unsplash.com/photo-1586495777744-4e6232bf5e2f?w=600&q=80',
@@ -131,15 +131,15 @@ export const products: Product[] = [
   },
   {
     id: '8',
-    name: 'Prírodný balzam na pery — Mätová sviežosť',
+    name: 'Přírodní balzám na rty — Mátová svěžest',
     slug: 'balzam-pery-mata-sviezost',
     price: 5.90,
     category: 'balzamy',
-    shortDescription: 'Chladivý balzam s organickou mätou a kokosom.',
+    shortDescription: 'Chladivý balzám s organickou mátou a kokosem.',
     description:
-      'Osviežujúci balzam na pery s organickým mätovým éterickým olejom a kokosovým olejom za studena lisovaným. Poskytuje okamžitú hydratáciu a jemný chladivý efekt. Bez parafínu, bez silikónov — len príroda.',
-    scent: 'Organická mäta pieporná, kokos, jemná citrusová nota',
-    materials: 'Včelí vosk, kokosový olej, mandľový olej, mätový éterický olej, vitamín E',
+      'Osvěžující balzám na rty s organickým mátovým éterickým olejem a za studena lisovaným kokosovým olejem. Poskytuje okamžitou hydrataci a jemný chladivý efekt. Bez parafínu, bez silikonů — jen příroda.',
+    scent: 'Organická máta peprná, kokos, jemný citrusový tón',
+    materials: 'Včelí vosk, kokosový olej, mandlový olej, mátový éterický olej, vitamín E',
     badge: 'Novinka',
     images: [
       'https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=600&q=80',
