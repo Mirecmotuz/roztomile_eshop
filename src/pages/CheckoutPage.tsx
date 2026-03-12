@@ -484,6 +484,7 @@ export default function CheckoutPage() {
                 <label className="flex items-center gap-3 p-4 border border-honey bg-honey-light cursor-pointer">
                   <input
                     type="radio"
+                    id="packeta"
                     name="deliveryMethod"
                     value="packeta"
                     checked={form.deliveryMethod === 'packeta'}
