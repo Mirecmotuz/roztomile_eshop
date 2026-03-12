@@ -59,6 +59,8 @@ function formatItems(order) {
 
 function buildCommonParams(order) {
   const createdAt = new Date(order.createdAt || Date.now());
+  const deliveryMethod = (order.formData && order.formData.deliveryMethod) || 'packeta';
+  const pickupAddress = 'Vodičkova 677/10, Praha 1';
 
   return {
     variable_symbol: order.variableSymbol,
@@ -72,6 +74,8 @@ function buildCommonParams(order) {
     packeta_point_name: (order.formData.packetaPoint && order.formData.packetaPoint.name) || '—',
     packeta_point_address: (order.formData.packetaPoint && order.formData.packetaPoint.address) || '—',
     packeta_point_id: (order.formData.packetaPoint && order.formData.packetaPoint.id) || '—',
+    delivery_method: deliveryMethod === 'pickup' ? 'Osobní odběr' : 'Packeta — výdejní místo',
+    delivery_address: deliveryMethod === 'pickup' ? pickupAddress : '—',
     iban: STORE_IBAN || '',
     created_at: createdAt.toLocaleString('cs-CZ', {
       dateStyle: 'long',
@@ -116,12 +120,7 @@ async function sendEmail(templateId, toEmail, params) {
   if (!EMAILJS_SERVICE_ID || !EMAILJS_PUBLIC_KEY || !templateId || !toEmail || !EMAILJS_ACCESS_TOKEN) {
     throw new Error('EmailJS configuration missing');
   }
-  console.log("EMAILJS_ACCESS_TOKEN", EMAILJS_ACCESS_TOKEN);
-  console.log("EMAILJS_PUBLIC_KEY", EMAILJS_PUBLIC_KEY);
-  console.log("EMAILJS_SERVICE_ID", EMAILJS_SERVICE_ID);
-  console.log("templateId", templateId);
-  console.log("toEmail", toEmail);
-  console.log("params", params);
+  console.log('EmailJS template params', params);
   const body = {
     service_id: EMAILJS_SERVICE_ID,
     template_id: templateId,

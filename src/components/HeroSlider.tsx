@@ -11,7 +11,7 @@ const slides = [
     heading: 'Velikonoční\nkolekce',
     sub: 'Ručně lité sójové svíčky s vůní jara. Přírodní, udržitelné, krásné.',
     cta: 'Objevit kolekci',
-    to: '/?category=sviečky&focus=products',
+    to: '/?category=svíčky&focus=products',
   },
   {
     id: 2,
@@ -29,7 +29,7 @@ const slides = [
     heading: 'Balzámy na rty\nbez kompromisů',
     sub: 'Jen to, co příroda dala. Žádný parafín, žádné silikony — jen čistá péče.',
     cta: 'Vybrat balzám',
-    to: '/?category=balzamy&focus=products',
+    to: '/?category=balzámy&focus=products',
   },
 ];
 

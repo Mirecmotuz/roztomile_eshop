@@ -12,6 +12,8 @@ import OurStoryPage from './pages/OurStoryPage';
 import CarePage from './pages/CarePage';
 import CheckoutPage, { usePacketaScript } from './pages/CheckoutPage';
 import SuccessPage from './pages/SuccessPage';
+import PrivacyPolicyPage from './pages/PrivacyPage';
+import TermsPage from './pages/TermsPage';
 
 const easeOut: Easing = 'easeOut';
 const easeIn: Easing = 'easeIn';
@@ -56,6 +58,8 @@ function AppRoutes() {
         <Route path="/care" element={<PageWrapper><CarePage /></PageWrapper>} />
         <Route path="/checkout" element={<PageWrapper><CheckoutPage /></PageWrapper>} />
         <Route path="/success" element={<PageWrapper><SuccessPage /></PageWrapper>} />
+        <Route path="/privacy-policy" element={<PageWrapper><PrivacyPolicyPage /></PageWrapper>} />
+        <Route path="/terms" element={<PageWrapper><TermsPage /></PageWrapper>} />
       </Routes>
     </AnimatePresence>
   );

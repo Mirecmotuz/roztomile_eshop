@@ -58,7 +58,7 @@ export default function ProductCard({ product }: Props) {
         {/* Out of stock overlay */}
         {!product.inStock && (
           <div className="absolute inset-0 bg-cream/70 flex items-center justify-center">
-            <span className="text-xs font-medium uppercase tracking-widest text-stone">Vypredané</span>
+            <span className="text-xs font-medium uppercase tracking-widest text-stone">Vyprodáno</span>
           </div>
         )}
       </Link>
@@ -136,11 +136,11 @@ export default function ProductCard({ product }: Props) {
               addItem(product, variantToUse);
             }}
             disabled={!product.inStock}
-            aria-label={`Pridať ${product.name} do košíka`}
+            aria-label={`Přidat ${product.name} do košíku`}
             className="flex items-center gap-1.5 px-3 py-1.5 border border-anthracite hover:bg-anthracite hover:text-cream disabled:border-stone/30 disabled:text-stone/40 disabled:cursor-not-allowed text-anthracite text-xs font-medium tracking-wide transition-colors"
           >
             <ShoppingBag size={12} />
-            <span className="hidden sm:inline">Do košíka</span>
+            <span className="hidden sm:inline">Do košíku</span>
           </button>
         </div>
       </div>

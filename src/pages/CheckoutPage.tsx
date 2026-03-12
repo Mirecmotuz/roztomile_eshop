@@ -55,6 +55,7 @@ const emptyForm: OrderFormData = {
   email: '',
   phone: '',
   note: '',
+  deliveryMethod: 'packeta',
   packetaPoint: null,
 };
 
@@ -121,8 +122,8 @@ function validate(form: OrderFormData): FieldErrors {
     errors.note = 'Text je príliš dlhý (max. 500 znakov).';
   }
 
-  // Packeta
-  if (!form.packetaPoint) {
+  // Packeta (povinné len pri doručení cez Packetu)
+  if (form.deliveryMethod === 'packeta' && !form.packetaPoint) {
     errors.packetaPoint = 'Vyberte výdajné miesto Packeta.';
   }
 
@@ -145,6 +146,8 @@ export default function CheckoutPage() {
   const turnstileWidgetIdRef = useRef<string | null>(null);
 
   const total = totalPrice();
+  const shippingCost = form.deliveryMethod === 'packeta' ? 2.9 : 0;
+  const grandTotal = total + shippingCost;
 
   const setField = <K extends keyof OrderFormData>(key: K, value: OrderFormData[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -158,8 +161,9 @@ export default function CheckoutPage() {
     // Pro jistotu zavřeme případnou předchozí instanci widgetu,
     // aby se při dalším otevření nenačítal v „rozbitém“ stavu.
     try {
-      if (typeof packeta.Widget.close === 'function') {
-        packeta.Widget.close();
+      const widgetAny = packeta.Widget as any;
+      if (widgetAny && typeof widgetAny.close === 'function') {
+        widgetAny.close();
       }
     } catch {
       // ignorujeme chyby pri zatváraní
@@ -472,49 +476,86 @@ export default function CheckoutPage() {
               </div>
             </section>
 
-            {/* Packeta */}
+            {/* Způsob doručení */}
             <section className="bg-cream border border-anthracite/8 p-6 space-y-4">
               <h2 className="font-serif text-lg font-semibold text-anthracite">Způsob doručení</h2>
 
-              <div className="flex items-center gap-3 p-4 border border-honey bg-honey-light">
-                <input type="radio" checked readOnly id="packeta" className="accent-brand" />
-                <label htmlFor="packeta" className="text-sm font-medium text-anthracite cursor-pointer">
-                  Packeta — výdejní místo
+              <div className="space-y-3">
+                <label className="flex items-center gap-3 p-4 border border-honey bg-honey-light cursor-pointer">
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    value="packeta"
+                    checked={form.deliveryMethod === 'packeta'}
+                    onChange={() => setField('deliveryMethod', 'packeta')}
+                    className="accent-brand"
+                  />
+                  <span className="text-sm font-medium text-anthracite">
+                    Packeta — výdejní místo
+                  </span>
+                </label>
+
+                <label className="flex items-center gap-3 p-4 border border-anthracite/10 bg-cream cursor-pointer hover:border-anthracite/30 transition-colors">
+                  <input
+                    type="radio"
+                    name="deliveryMethod"
+                    value="pickup"
+                    checked={form.deliveryMethod === 'pickup'}
+                    onChange={() => {
+                      setField('deliveryMethod', 'pickup');
+                      setField('packetaPoint', null);
+                    }}
+                    className="accent-brand"
+                  />
+                  <span className="text-sm font-medium text-anthracite">
+                    Osobní odběr
+                  </span>
                 </label>
               </div>
 
-              {form.packetaPoint ? (
-                <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-md">
-                  <MapPin size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
-                  <div className="flex-1">
-                    <p className="text-sm font-semibold text-green-800">{form.packetaPoint.name}</p>
-                    <p className="text-xs text-green-600 mt-0.5">{form.packetaPoint.address}</p>
+              {form.deliveryMethod === 'packeta' ? (
+                form.packetaPoint ? (
+                  <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 rounded-md">
+                    <MapPin size={16} className="text-green-600 mt-0.5 flex-shrink-0" />
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold text-green-800">{form.packetaPoint.name}</p>
+                      <p className="text-xs text-green-600 mt-0.5">{form.packetaPoint.address}</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={openPacketaWidget}
+                      disabled={!packetaReady}
+                      className="text-xs text-honey hover:underline flex-shrink-0"
+                    >
+                      Změnit
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={openPacketaWidget}
-                    disabled={!packetaReady}
-                    className="text-xs text-honey hover:underline flex-shrink-0"
-                  >
-                    Zmeniť
-                  </button>
-                </div>
+                ) : (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={openPacketaWidget}
+                      disabled={!packetaReady}
+                      className="flex items-center gap-2 px-4 py-2.5 bg-anthracite hover:bg-anthracite/90 disabled:bg-stone/20 disabled:cursor-not-allowed text-cream text-xs font-semibold uppercase tracking-widest transition-colors"
+                    >
+                      <MapPin size={15} />
+                      {packetaReady ? 'Vybrat výdejní místo' : 'Načítá se widget…'}
+                    </button>
+                    {errors.packetaPoint && (
+                      <p className="flex items-center gap-1.5 text-xs text-red-500 mt-2">
+                        <AlertCircle size={12} /> {errors.packetaPoint}
+                      </p>
+                    )}
+                  </div>
+                )
               ) : (
-                <div>
-                  <button
-                    type="button"
-                    onClick={openPacketaWidget}
-                    disabled={!packetaReady}
-                    className="flex items-center gap-2 px-4 py-2.5 bg-anthracite hover:bg-anthracite/90 disabled:bg-stone/20 disabled:cursor-not-allowed text-cream text-xs font-semibold uppercase tracking-widest transition-colors"
-                  >
-                    <MapPin size={15} />
-                    {packetaReady ? 'Vybrat výdejní místo' : 'Načítá se widget…'}
-                  </button>
-                  {errors.packetaPoint && (
-                    <p className="flex items-center gap-1.5 text-xs text-red-500 mt-2">
-                      <AlertCircle size={12} /> {errors.packetaPoint}
-                    </p>
-                  )}
+                <div className="p-4 bg-stone/8 border border-anthracite/10 rounded-md space-y-1">
+                  <p className="text-[10px] font-semibold uppercase tracking-widest text-stone/70">
+                    Místo osobního odběru
+                  </p>
+                  <p className="text-sm font-semibold text-anthracite">
+                    Vodičkova 677/10, Praha 1
+                  </p>
                 </div>
               )}
             </section>
@@ -546,7 +587,7 @@ export default function CheckoutPage() {
             className="lg:col-span-2"
           >
             <div className="bg-cream border border-anthracite/8 p-6 sticky top-24 space-y-5">
-              <h2 className="font-serif text-lg font-semibold text-anthracite">Zhrnutie objednávky</h2>
+              <h2 className="font-serif text-lg font-semibold text-anthracite">Shrnutí objednávky</h2>
 
               <ul className="divide-y divide-anthracite/6 space-y-3">
                 {items.map(({ product, quantity, selectedVariant }) => {
@@ -574,14 +615,14 @@ export default function CheckoutPage() {
 
               <div className="border-t border-anthracite/8 pt-4 space-y-2">
                 <div className="flex justify-between text-sm text-stone">
-                  <span>Doprava (Packeta)</span>
+                  <span>Doprava</span>
                   <span className="font-medium text-anthracite">
-                    {total >= 40 ? 'Zdarma' : '2,90 Kč'}
+                    {shippingCost.toFixed(2).replace('.', ',')} Kč
                   </span>
                 </div>
                 <div className="flex justify-between text-base font-bold text-anthracite">
                   <span>Celkem</span>
-                  <span>{(total < 40 ? total + 2.9 : total).toFixed(2).replace('.', ',')} Kč</span>
+                  <span>{grandTotal.toFixed(2).replace('.', ',')} Kč</span>
                 </div>
               </div>
 
@@ -589,7 +630,7 @@ export default function CheckoutPage() {
                 <div>
                   <div ref={captchaRef} className="flex justify-center" />
                   <p className="mt-2 text-[10px] text-stone/60 text-center leading-relaxed">
-                    Tento formulár je chránený službou Cloudflare Turnstile.
+                    Tento formulář je chráněn službou Cloudflare Turnstile.
                   </p>
                 </div>
 
@@ -605,7 +646,7 @@ export default function CheckoutPage() {
                   </>
                 ) : (
                   <>
-                    Odeslat objednávku
+                    Odeslat objednávku a zaplatit
                     <ChevronRight size={16} />
                   </>
                 )}

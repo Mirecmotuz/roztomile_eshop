@@ -6,7 +6,7 @@ export const products: Product[] = [
     name: 'Velikonoční svíčka — Jarní louka',
     slug: 'velkonocna-sviecka-jarna-luka',
     price: 14.90,
-    category: 'sviečky',
+    category: 'svíčky',
     shortDescription: 'Ručně litá sójová svíčka s vůní čerstvých květů a trávy.',
     description:
       'Tato velikonoční svíčka je ručně litá ze 100 % přírodního sójového vosku. Vůně jemné jarní louky přinese do vašeho domova pocit svěžesti a obnovy. Ideální dárek k Velikonocům nebo radost pro sebe.',
@@ -26,7 +26,7 @@ export const products: Product[] = [
     name: 'Velikonoční svíčka — Vanilka & Tonka',
     slug: 'velkonocna-sviecka-vanilka-tonka',
     price: 14.90,
-    category: 'sviečky',
+    category: 'svíčky',
     shortDescription: 'Teplá a smyslná vůně vanilky s hřejivým tónem tonky.',
     description:
       'Luxusní svíčka s bohatou kombinací madagaskarské vanilky a vzácného tonkového bobu. Hřejivá, sladká vůně vytváří útulnou atmosféru během velikonočních svátků. Ručně litá v malém množství.',
@@ -46,7 +46,7 @@ export const products: Product[] = [
     name: 'Velikonoční svíčka — Levandule & Eukalyptus',
     slug: 'velkonocna-sviecka-lavender-eukalyptus',
     price: 16.50,
-    category: 'sviečky',
+    category: 'svíčky',
     shortDescription: 'Uklidňující kombinace levandule a čerstvého eukalyptu.',
     description:
       'Přírodní sójová svíčka s bylinkovou vůní levandulových polí a ostrým, čerstvým eukalyptem. Perfektní do koupelny nebo ložnice jako relaxační rituál. Ručně vyrobená s láskou.',
@@ -115,7 +115,7 @@ export const products: Product[] = [
     name: 'Přírodní balzám na rty — Růžové lístky',
     slug: 'balzam-pery-ruzove-listky',
     price: 5.90,
-    category: 'balzamy',
+    category: 'balzámy',
     shortDescription: 'Jemný výživný balzám s vůní čerstvých růží a mandlovým olejem.',
     description:
       'Intenzivně vyživující balzám na rty bez syntetických přísad. Kombinace rakytníkového oleje, bambuckého másla a růžové vody poskytuje dlouhotrvající hydrataci. Jemná růžová vůně dělá z každého použití příjemný rituál.',
@@ -134,7 +134,7 @@ export const products: Product[] = [
     name: 'Přírodní balzám na rty — Mátová svěžest',
     slug: 'balzam-pery-mata-sviezost',
     price: 5.90,
-    category: 'balzamy',
+    category: 'balzámy',
     shortDescription: 'Chladivý balzám s organickou mátou a kokosem.',
     description:
       'Osvěžující balzám na rty s organickým mátovým éterickým olejem a za studena lisovaným kokosovým olejem. Poskytuje okamžitou hydrataci a jemný chladivý efekt. Bez parafínu, bez silikonů — jen příroda.',

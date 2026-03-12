@@ -65,10 +65,6 @@ function buildSpdString({
     `MSG:${name}`,
   ];
 
-  // if (vsClean) {
-  //   parts.push(`VS:${vsClean}`); // Tu bola chyba (X-VS -> VS)
-  // }
-
   return `SPD*1.0*${parts.join('*')}*`; 
 }
 
@@ -162,7 +158,7 @@ export default function SuccessPage() {
 
   if (!order) return null;
 
-  const shipping = order.totalAmount < 40 ? 2.9 : 0;
+  const shipping = order.formData.deliveryMethod === 'packeta' ? 2.9 : 0;
   const grandTotal = order.totalAmount + shipping;
 
   return (
@@ -235,7 +231,7 @@ export default function SuccessPage() {
           </div>
         </motion.div>
 
-        {/* QR + Packeta side by side */}
+        {/* QR + Doručení side by side */}
         <motion.div variants={fadeUpVariants} className="w-full grid grid-cols-1 sm:grid-cols-2 gap-5">
           <PayBySquareQR
             vs={order.variableSymbol}
@@ -245,24 +241,44 @@ export default function SuccessPage() {
             orderId={order.id}
           />
 
-          {/* Packeta info */}
-          {order.formData.packetaPoint && (
+          {/* Doručení */}
+          {order.formData.deliveryMethod === 'packeta' ? (
             <div className="flex flex-col items-center gap-3 p-5 bg-white border border-gray-100 rounded-lg shadow-soft">
               <div className="flex items-center justify-center w-14 h-14 bg-honey-light">
                 <Package size={26} className="text-honey" />
               </div>
               <div className="text-center">
                 <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Výdejní místo</p>
-                <p className="text-sm font-semibold text-anthracite mt-1">
-                  {order.formData.packetaPoint.name}
-                </p>
-                <p className="text-xs text-gray-400 mt-0.5 leading-snug">
-                  {order.formData.packetaPoint.address}
-                </p>
+                {order.formData.packetaPoint ? (
+                  <>
+                    <p className="text-sm font-semibold text-anthracite mt-1">
+                      {order.formData.packetaPoint.name}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-0.5 leading-snug">
+                      {order.formData.packetaPoint.address}
+                    </p>
+                  </>
+                ) : (
+                  <p className="text-sm font-semibold text-anthracite mt-1">
+                    — 
+                  </p>
+                )}
                 <div className="flex items-center justify-center gap-1 mt-2 text-xs text-honey">
                   <MapPin size={12} />
                   <span>Packeta</span>
                 </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-3 p-5 bg-white border border-gray-100 rounded-lg shadow-soft">
+              <div className="flex items-center justify-center w-14 h-14 bg-honey-light">
+                <MapPin size={26} className="text-honey" />
+              </div>
+              <div className="text-center">
+                <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Osobní odběr</p>
+                <p className="text-sm font-semibold text-anthracite mt-1">
+                  Vodičkova 677/10, Praha 1
+                </p>
               </div>
             </div>
           )}

@@ -7,9 +7,9 @@ import { ProductCategory } from '../types';
 
 const categories: { value: ProductCategory | 'all'; label: string }[] = [
   { value: 'all', label: 'Všechny' },
-  { value: 'sviečky', label: 'Svíčky' },
+  { value: 'svíčky', label: 'Svíčky' },
   { value: 'včelí vosk', label: 'Včelí vosk' },
-  { value: 'balzamy', label: 'Balzámy' },
+  { value: 'balzámy', label: 'Balzámy' },
 ];
 
 const sortOptions = [

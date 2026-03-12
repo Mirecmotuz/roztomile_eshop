@@ -1,4 +1,4 @@
-export type ProductCategory = 'sviečky' | 'včelí vosk' | 'balzamy';
+export type ProductCategory = 'svíčky' | 'včelí vosk' | 'balzámy';
 
 export type ProductBadge = 'Novinka' | 'Bestseller';
 
@@ -44,6 +44,7 @@ export interface OrderFormData {
   email: string;
   phone: string;
   note: string;
+  deliveryMethod: 'packeta' | 'pickup';
   packetaPoint: PacketaPoint | null;
 }
 

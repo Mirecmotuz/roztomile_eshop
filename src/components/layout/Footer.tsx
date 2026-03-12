@@ -10,9 +10,9 @@ const quickLinks = [
 ];
 
 const categories = [
-  { to: '/?category=sviečky&focus=products', label: 'Svíčky' },
+  { to: '/?category=svíčky&focus=products', label: 'Svíčky' },
   { to: '/?category=včelí vosk&focus=products', label: 'Včelí vosk' },
-  { to: '/?category=balzamy&focus=products', label: 'Balzámy na rty' },
+  { to: '/?category=balzámy&focus=products', label: 'Balzámy na rty' },
 ];
 
 export default function Footer() {
@@ -161,7 +161,7 @@ export default function Footer() {
         <div className="mt-12 pt-6 border-t border-cream/10 flex flex-col sm:flex-row items-center justify-between gap-3 text-[10px] text-cream/30 uppercase tracking-widest">
           <p>© {new Date().getFullYear()} Roztomile</p>
           <div className="flex gap-6">
-            <Link to="/privacy" className="hover:text-honey transition-colors">Ochrana soukromí</Link>
+            <Link to="/privacy-policy" className="hover:text-honey transition-colors">Ochrana soukromí</Link>
             <Link to="/terms" className="hover:text-honey transition-colors">Obchodní podmínky</Link>
           </div>
         </div>

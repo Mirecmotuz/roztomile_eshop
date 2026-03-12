@@ -15,9 +15,9 @@ export default function ProductDetail() {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const hasVariants = Array.isArray(product.variants) && product.variants.length > 0;
+  const hasVariants = Array.isArray(product?.variants) && (product?.variants?.length ?? 0) > 0;
   const [selectedVariant, setSelectedVariant] = useState<string>(
-    hasVariants ? product.variants![0] : '',
+    hasVariants && product?.variants ? product.variants[0] : '',
   );
   const [variantOpen, setVariantOpen] = useState(false);
   const variantRef = useRef<HTMLDivElement | null>(null);
@@ -40,8 +40,8 @@ export default function ProductDetail() {
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4">
-        <p className="text-stone text-lg">Produkt sa nenašiel.</p>
-        <Link to="/" className="text-honey hover:underline text-sm">← Späť do obchodu</Link>
+        <p className="text-stone text-lg">Produkt nebyl nalezen.</p>
+        <Link to="/" className="text-honey hover:underline text-sm">← Zpět do obchodu</Link>
       </div>
     );
   }
@@ -66,7 +66,7 @@ export default function ProductDetail() {
         className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-stone hover:text-anthracite transition-colors mb-10"
       >
         <ArrowLeft size={13} />
-        Späť
+        Zpět
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-14">
@@ -242,12 +242,12 @@ export default function ProductDetail() {
               }`}
             >
               <ShoppingBag size={14} />
-              {added ? 'Pridané ✓' : product.inStock ? 'Pridať do košíka' : 'Vypredané'}
+              {added ? 'Přidáno ✓' : product.inStock ? 'Přidat do košíku' : 'Vyprodáno'}
             </button>
           </div>
 
           <p className="text-xs text-stone/50">
-            Doprava cez Packeta výdajné miesta. Platba bankovým prevodom.
+            Doprava přes výdejní místa Packeta. Platba bankovním převodem.
           </p>
         </motion.div>
       </div>
