@@ -146,7 +146,7 @@ export default function CheckoutPage() {
   const turnstileWidgetIdRef = useRef<string | null>(null);
 
   const total = totalPrice();
-  const shippingCost = form.deliveryMethod === 'packeta' ? 2.9 : 0;
+  const shippingCost = form.deliveryMethod === 'packeta' ? 79 : 0;
   const grandTotal = total + shippingCost;
 
   const setField = <K extends keyof OrderFormData>(key: K, value: OrderFormData[K]) => {
