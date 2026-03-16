@@ -173,6 +173,21 @@ export default function ProductDetail() {
 
           <p className="text-stone leading-relaxed">{product.description}</p>
 
+          {(product.handmadeTitle || product.handmadeDescription) && (
+            <div className="mt-2 bg-honey-light border border-honey/20 rounded-md p-4 space-y-1">
+              {product.handmadeTitle && (
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-honey">
+                  {product.handmadeTitle}
+                </p>
+              )}
+              {product.handmadeDescription && (
+                <p className="text-xs text-stone leading-relaxed">
+                  {product.handmadeDescription}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Meta info */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {product.scent && (
@@ -188,7 +203,7 @@ export default function ProductDetail() {
               <div className="flex items-start gap-2 p-3 bg-stone/8">
                 <Clock size={14} className="text-stone mt-0.5 flex-shrink-0" />
                 <div>
-                  <p className="text-[10px] font-semibold text-stone uppercase tracking-wide">Horenie</p>
+                  <p className="text-[10px] font-semibold text-stone uppercase tracking-wide">Hoření</p>
                   <p className="text-xs text-stone mt-0.5">{product.burnTime}</p>
                 </div>
               </div>
@@ -199,6 +214,15 @@ export default function ProductDetail() {
                 <div>
                   <p className="text-[10px] font-semibold text-stone uppercase tracking-wide">Váha</p>
                   <p className="text-xs text-stone mt-0.5">{product.weight}</p>
+                </div>
+              </div>
+            )}
+            {product.dimensions && (
+              <div className="flex items-start gap-2 p-3 bg-stone/8">
+                <Weight size={14} className="text-stone mt-0.5 flex-shrink-0" />
+                <div>
+                  <p className="text-[10px] font-semibold text-stone uppercase tracking-wide">Rozměry</p>
+                  <p className="text-xs text-stone/80 mt-0.5">{product.dimensions}</p>
                 </div>
               </div>
             )}

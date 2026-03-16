@@ -18,6 +18,9 @@ export interface Product {
   weight?: string;
   burnTime?: string;
   variants?: string[];
+  handmadeTitle?: string;
+  handmadeDescription?: string;
+  dimensions?: string;
 }
 
 export interface CartItem {
