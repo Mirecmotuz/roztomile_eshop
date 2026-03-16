@@ -1,4 +1,6 @@
 import { Product } from '../types';
+const photos = import.meta.glob('./photos/*.{jpeg,jpg,png,webp}', { eager: true, as: 'url' }) as Record<string, string>;
+const photo = (fileName: string) => photos[`./photos/${fileName}`];
 
 export const products: Product[] = [
   {
@@ -13,9 +15,9 @@ export const products: Product[] = [
     materials: '100 % sójový vosk, bavlněný knot, přírodní barvy do svíček',
     badge: 'Novinka',
     images: [
-      'https://images.unsplash.com/photo-1603905219867-ef465f9c8cd5?w=600&q=80',
-      'https://images.unsplash.com/photo-1603905219867-ef465f9c8cd5?w=600&q=80',
+      photo('kvetinove_fialove.jpeg')
     ],
+    variants: ['fialová'],
     inStock: true,
     weight: '151 g',
     burnTime: '5 hodin',
@@ -36,9 +38,15 @@ export const products: Product[] = [
     materials: '100 % sójový vosk, bavlněný knot, přírodní barvy do svíček',
     badge: 'Bestseller',
     images: [
-      'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=600&q=80',
-      'https://images.unsplash.com/photo-1599643477877-530eb83abc8e?w=600&q=80',
+      photo('pruhy_zelene.jpeg'),
+      photo('pruhy_ruzove.jpeg'),
+      photo('pruhy_zlte.jpeg'),
+      photo('pruhy_fialove.jpeg'),
+      photo('pruhy_cervene.jpeg'),
+      photo('pruhy_svetlozelene.jpeg'),
+      photo('pruhy_lososove.jpeg')
     ],
+    variants: ['zelená', 'růžová', 'žlutá', 'fialová', 'červená', 'světlezelená', 'lososová'],
     inStock: true,
     weight: '70 g',
     burnTime: '4 hodiny',
@@ -59,9 +67,11 @@ export const products: Product[] = [
       'Ručně litá svíčka ze sójového vosku díky své textuře působí přirozeně a elegantně, krásně vynikne samostatně i v kombinaci s pruhovaným Velikonočním vajíčkem. Utvoří vaši jarní či Velikonoční výzdobu.',
     materials: '100 % sójový vosk, bavlněný knot, přírodní barvy do svíček',
     images: [
-      'https://images.unsplash.com/photo-1608571423539-e951cb2b69b5?w=600&q=80',
-      'https://images.unsplash.com/photo-1608571423539-e951cb2b69b5?w=600&q=80',
+      photo('relief_zlty.jpeg'),
+      photo('relief_svetlomodra.jpeg'),
+      photo('relief_zeleny.jpeg')
     ],
+    variants: ['žlutá', 'světlemodrá', 'zelená'],
     inStock: true,
     weight: '80 g',
     burnTime: '4 hodiny',
