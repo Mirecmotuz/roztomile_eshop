@@ -7,7 +7,7 @@ export const products: Product[] = [
     id: '1',
     name: 'Květinové Velikonoční vajíčko',
     slug: 'kvetinove-velikonocni-vajicko',
-    price: 14.90,
+    price: 110,
     category: 'svíčky',
     shortDescription: 'Ručně litá sójová svíčka.',
     description:
@@ -30,7 +30,7 @@ export const products: Product[] = [
     id: '2',
     name: 'Pruhované Velikonoční vajíčko ',
     slug: 'pruhované-velikonocni-vajicko',
-    price: 14.90,
+    price: 70,
     category: 'svíčky',
     shortDescription: 'Ručně litá sójová svíčka.',
     description:
@@ -60,7 +60,7 @@ export const products: Product[] = [
     id: '3',
     name: 'Velikonoční vajíčko s jemným reliéfem',
     slug: 'velikonocni-vajicko-s-jemnym-reliefem',
-    price: 16.50,
+    price: 80,
     category: 'svíčky',
     shortDescription: 'Ručně litá sójová svíčka.',
     description:
