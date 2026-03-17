@@ -376,7 +376,7 @@ export default function ProductDetail() {
 
           {/* Materials */}
           <div className="border-t border-anthracite/8 pt-5">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone/60 mb-2">Zloženie</p>
+            <p className="text-[10px] font-semibold uppercase tracking-widest text-stone/60 mb-2">Složení</p>
             <p className="text-sm text-stone leading-relaxed">{product.materials}</p>
           </div>
 
