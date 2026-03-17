@@ -25,6 +25,13 @@ export const useCartStore = create<CartStore>()(
       isOpen: false,
 
       addItem: (product, selectedVariant) => {
+        const itemImage =
+          product.enableVariantImageSwitch &&
+          selectedVariant &&
+          product.variantImages?.[selectedVariant]
+            ? product.variantImages[selectedVariant]
+            : product.images[0];
+
         const existing = get().items.find(
           (i) => i.product.id === product.id && i.selectedVariant === selectedVariant,
         );
@@ -44,6 +51,7 @@ export const useCartStore = create<CartStore>()(
                 product,
                 quantity: 1,
                 ...(selectedVariant ? { selectedVariant } : {}),
+                image: itemImage,
               },
             ],
           }));

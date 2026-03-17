@@ -74,7 +74,7 @@ export default function CartDrawer() {
                 </div>
               ) : (
                 <ul className="space-y-5">
-                  {items.map(({ product, quantity, selectedVariant }) => {
+                  {items.map(({ product, quantity, selectedVariant, image }) => {
                     const displayName = selectedVariant
                       ? `${product.name} (${selectedVariant})`
                       : product.name;
@@ -84,7 +84,7 @@ export default function CartDrawer() {
                         className="flex gap-4"
                       >
                         <img
-                          src={product.images[0]}
+                          src={image ?? product.images[0]}
                           alt={product.name}
                           className="w-20 h-20 object-cover flex-shrink-0 bg-stone/10"
                         />

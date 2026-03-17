@@ -591,14 +591,14 @@ export default function CheckoutPage() {
               <h2 className="font-serif text-lg font-semibold text-anthracite">Shrnutí objednávky</h2>
 
               <ul className="divide-y divide-anthracite/6 space-y-3">
-                {items.map(({ product, quantity, selectedVariant }) => {
+                {items.map(({ product, quantity, selectedVariant, image }) => {
                   const displayName = selectedVariant
                     ? `${product.name} (${selectedVariant})`
                     : product.name;
                   return (
                     <li key={`${product.id}-${selectedVariant ?? 'default'}`} className="flex items-center gap-3 pt-3 first:pt-0">
                       <img
-                        src={product.images[0]}
+                        src={image ?? product.images[0]}
                         alt={product.name}
                         className="w-14 h-14 object-cover bg-stone/10 flex-shrink-0"
                       />

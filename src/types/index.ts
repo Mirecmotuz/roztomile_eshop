@@ -29,6 +29,7 @@ export interface CartItem {
   product: Product;
   quantity: number;
   selectedVariant?: string;
+  image?: string;
 }
 
 export interface OrderItem {
