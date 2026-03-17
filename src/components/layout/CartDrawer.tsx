@@ -1,14 +1,22 @@
 import { useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
 
 export default function CartDrawer() {
   const { isOpen, closeCart, items, removeItem, updateQuantity, totalPrice } = useCartStore();
+  const location = useLocation();
+  const navigate = useNavigate();
   const overlayRef = useRef<HTMLDivElement>(null);
 
   const total = totalPrice();
+  const handleContinueShopping = () => {
+    closeCart();
+    if (location.pathname === '/checkout') {
+      navigate('/?focus=products');
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -58,7 +66,7 @@ export default function CartDrawer() {
                   <ShoppingBag size={40} className="text-stone/20" />
                   <p className="text-stone text-sm">Váš košík je prázdný.</p>
                   <button
-                    onClick={closeCart}
+                    onClick={handleContinueShopping}
                     className="text-xs font-medium uppercase tracking-widest text-honey hover:underline"
                   >
                     Pokračovat v nákupu →
@@ -140,7 +148,7 @@ export default function CartDrawer() {
                   Přejít k pokladně
                 </Link>
                 <button
-                  onClick={closeCart}
+                  onClick={handleContinueShopping}
                   className="block w-full text-center py-2 text-xs uppercase tracking-widest text-stone hover:text-anthracite transition-colors"
                 >
                   Pokračovat v nákupu
