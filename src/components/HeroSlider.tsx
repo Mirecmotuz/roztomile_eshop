@@ -3,34 +3,49 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
+const photos = import.meta.glob('../data/photos/*.{jpeg,jpg,png,webp}', {
+  eager: true,
+  as: 'url',
+}) as Record<string, string>;
+
+const photo = (fileName: string) => {
+  const key = `../data/photos/${fileName}`;
+  const url = photos[key];
+  if (!url) {
+    console.warn(`[HeroSlider] Missing photo: ${key}`);
+    return '';
+  }
+  return url;
+};
+
 const slides = [
   {
     id: 1,
-    image: 'https://images.unsplash.com/photo-1603905219867-ef465f9c8cd5?w=1600&q=85',
+    image: photo('vajicka_frontpage.jpeg'),
     tag: 'Jaro 2026',
     heading: 'Velikonoční\nkolekce',
     sub: 'Přivítej jaro v barvách! Ručně lité svíčky, které rozzáří váš domov jarními odstíny. Přírodní a udržitelné.',
     cta: 'To chci',
     to: '/?category=svíčky&focus=products',
   },
-  {
-    id: 2,
-    image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85',
-    tag: '100 % přírodní',
-    heading: 'Přírodní balzámy\n na rty',
-    sub: 'Jen to, co příroda dala. Žádný parafín, žádné silikony — to nejlepší pro vaše rty.',
-    cta: 'To chci',
-    to: '/?category=včelí vosk&focus=products',
-  },
-  {
-    id: 3,
-    image: 'https://images.unsplash.com/photo-1586495777744-4e6232bf5e2f?w=1600&q=85',
-    tag: 'Zero Waste',
-    heading: 'Včelí vosk –\n šetrný k planetě a vaší kuchyni',
-    sub: 'Ekologická alternativa plastové fólie z přírodního včelího vosku. Vydrží až rok.',
-    cta: 'To chci',
-    to: '/?category=balzámy&focus=products',
-  },
+  // {
+  //   id: 2,
+  //   image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85',
+  //   tag: '100 % přírodní',
+  //   heading: 'Přírodní balzámy\n na rty',
+  //   sub: 'Jen to, co příroda dala. Žádný parafín, žádné silikony — to nejlepší pro vaše rty.',
+  //   cta: 'To chci',
+  //   to: '/?category=včelí vosk&focus=products',
+  // },
+  // {
+  //   id: 3,
+  //   image: 'https://images.unsplash.com/photo-1586495777744-4e6232bf5e2f?w=1600&q=85',
+  //   tag: 'Zero Waste',
+  //   heading: 'Včelí vosk –\n šetrný k planetě a vaší kuchyni',
+  //   sub: 'Ekologická alternativa plastové fólie z přírodního včelího vosku. Vydrží až rok.',
+  //   cta: 'To chci',
+  //   to: '/?category=balzámy&focus=products',
+  // },
 ];
 
 const AUTOPLAY_MS = 5000;
