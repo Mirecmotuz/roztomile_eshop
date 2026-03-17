@@ -12,15 +12,36 @@ export default function ProductDetail() {
 
   const product = slug ? getProductBySlug(slug) : undefined;
 
-  const [selectedImage, setSelectedImage] = useState(0);
+  const [selectedImage, setSelectedImage] = useState<string>('');
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
+  const [careOpen, setCareOpen] = useState(false);
   const hasVariants = Array.isArray(product?.variants) && (product?.variants?.length ?? 0) > 0;
-  const [selectedVariant, setSelectedVariant] = useState<string>(
-    hasVariants && product?.variants ? product.variants[0] : '',
-  );
+  const isVariantSwitching = Boolean(product?.enableVariantImageSwitch) && hasVariants;
+  const [selectedVariant, setSelectedVariant] = useState<string>('');
   const [variantOpen, setVariantOpen] = useState(false);
   const variantRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!product) return;
+
+    if (!isVariantSwitching) {
+      setSelectedImageIndex(0);
+      setSelectedImage('');
+      setSelectedVariant('');
+      return;
+    }
+
+    const initialVariant = product.variants?.[0] ?? '';
+    const initialImage =
+      (initialVariant && product.variantImages?.[initialVariant]) || product.images[0] || '';
+    const initialIndex = initialImage ? Math.max(0, product.images.indexOf(initialImage)) : 0;
+
+    setSelectedVariant(initialVariant);
+    setSelectedImage('');
+    setSelectedImageIndex(initialIndex);
+  }, [product, isVariantSwitching]);
 
   useEffect(() => {
     if (!variantOpen) return;
@@ -46,10 +67,17 @@ export default function ProductDetail() {
     );
   }
 
+  const variantImage = isVariantSwitching
+    ? product.variantImages?.[selectedVariant] || product.images[0]
+    : '';
+  const displayImage = isVariantSwitching
+    ? selectedImage || variantImage
+    : product.images[selectedImageIndex];
+
   const handleAddToCart = () => {
     const variantToUse =
       hasVariants && product.variants && product.variants.length > 0
-        ? selectedVariant || product.variants[0]
+        ? (isVariantSwitching ? selectedVariant || product.variants[0] : product.variants[0])
         : undefined;
     for (let i = 0; i < quantity; i += 1) {
       addItem(product, variantToUse);
@@ -79,7 +107,7 @@ export default function ProductDetail() {
         >
           <div className="relative aspect-square overflow-hidden bg-stone/10">
             <img
-              src={product.images[selectedImage]}
+              src={displayImage}
               alt={product.name}
               className="w-full h-full object-cover"
             />
@@ -96,9 +124,31 @@ export default function ProductDetail() {
               {product.images.map((img, i) => (
                 <button
                   key={i}
-                  onClick={() => setSelectedImage(i)}
+                  onClick={() => {
+                    if (isVariantSwitching) {
+                      const matchedVariant = Object.entries(product.variantImages ?? {}).find(
+                        ([, url]) => url === img,
+                      )?.[0];
+
+                      // Ak thumbnail zodpovedá farbe, zosynchronizuj farbu s galériou
+                      if (matchedVariant) {
+                        setSelectedVariant(matchedVariant);
+                        setSelectedImage('');
+                        setSelectedImageIndex(i);
+                        return;
+                      }
+
+                      // Inak sa správaj ako “dočasný override” bez zmeny farby
+                      setSelectedImage(img);
+                      setSelectedImageIndex(i);
+                      return;
+                    }
+                    setSelectedImageIndex(i);
+                  }}
                   className={`w-20 h-20 overflow-hidden border-2 transition-colors ${
-                    i === selectedImage ? 'border-anthracite' : 'border-transparent opacity-60 hover:opacity-100'
+                    i === selectedImageIndex
+                      ? 'border-anthracite'
+                      : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
                   <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
@@ -123,10 +173,10 @@ export default function ProductDetail() {
             <p className="font-serif text-3xl font-semibold text-anthracite mt-4">
               {product.price.toFixed(2).replace('.', ',')} Kč
             </p>
-            {hasVariants && (
+            {isVariantSwitching && (
               <div className="mt-4 max-w-xs relative" ref={variantRef}>
                 <label className="sr-only" htmlFor={`variant-detail-${product.id}`}>
-                  Variant produktu
+                  Barva produktu
                 </label>
                 <button
                   id={`variant-detail-${product.id}`}
@@ -154,6 +204,10 @@ export default function ProductDetail() {
                           onClick={() => {
                             setSelectedVariant(v);
                             setVariantOpen(false);
+                            setSelectedImage('');
+                            const img = product.variantImages?.[v] || product.images[0] || '';
+                            const idx = img ? Math.max(0, product.images.indexOf(img)) : 0;
+                            setSelectedImageIndex(idx);
                           }}
                           className={`w-full text-left px-3 py-1.5 text-[11px] tracking-widest uppercase transition-colors ${
                             active
@@ -223,6 +277,98 @@ export default function ProductDetail() {
                 <div>
                   <p className="text-[10px] font-semibold text-stone uppercase tracking-wide">Rozměry</p>
                   <p className="text-xs text-stone/80 mt-0.5">{product.dimensions}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Care accordion */}
+          <div className="bg-cream border border-anthracite/8">
+            <button
+              type="button"
+              onClick={() => setCareOpen((o) => !o)}
+              aria-expanded={careOpen}
+              className="w-full flex items-center justify-between gap-3 p-4 text-left"
+            >
+              <span className="font-serif text-base font-semibold text-anthracite">
+                Použití, péče a bezpečnostní upozornění o svíčce
+              </span>
+              <ChevronDown
+                size={16}
+                className={`shrink-0 text-stone transition-transform ${careOpen ? 'rotate-180' : ''}`}
+              />
+            </button>
+
+            {careOpen && (
+              <div className="border-t border-anthracite/8 p-4">
+                <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-stone">
+                      Co očekávat při hoření:
+                    </p>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                        Nerovnoměrné odhořívání: U dekorativních svíček je kvůli jejich specifickému tvaru běžné a
+                        přirozené.
+                      </li>
+                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                        Stékání vosku: Vzhledem k designu může vosk vytékat více než u klasických svíček. Vždy používejte
+                        dostatečně velký nehořlavý podnos, nikdy nestavte svíčku přímo na nábytek.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-stone">
+                      Jak se o svíčku starat:
+                    </p>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                        Knot: Před každým zapálením jej zkraťte na 3–5 mm. Zamezíte tím silnému kouření.
+                      </li>
+                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                        Doba hoření: Ideálně maximálně 1 hodinu. Během hoření se svíčkou nemanipulujte, aby nedošlo k
+                        převržení nebo vytečení vosku.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-widest text-stone">
+                      Bezpečnostní upozornění:
+                    </p>
+                    <ul className="space-y-2">
+                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                        Určeno pouze pro dospělé a svéprávné osoby. Používejte na vlastní nebezpečí.
+                      </li>
+                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                        Svíčky nejsou určeny ke konzumaci.
+                      </li>
+                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                        Nikdy nenechávejte hořící svíčku bez dozoru.
+                      </li>
+                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                        Upozornění pro citlivé osoby: Některé esenciální oleje nemusí být vhodné pro těhotné/kojící ženy,
+                        malé děti a zvířata. Naše oleje jsou bez parabenů a ftalátů a splňují normy IFRA.
+                      </li>
+                    </ul>
+                  </div>
+
+                  <p className="text-xs text-stone/70">
+                    💡 Kompletní informace o složení a podrobný návod najdete na stránce{' '}
+                    <Link to="/care" className="text-honey hover:underline">
+                      Péče o svíčky
+                    </Link>
+                    .
+                  </p>
                 </div>
               </div>
             )}

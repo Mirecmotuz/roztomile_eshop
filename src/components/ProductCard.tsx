@@ -17,6 +17,10 @@ export default function ProductCard({ product }: Props) {
   );
   const [variantOpen, setVariantOpen] = useState(false);
   const variantRef = useRef<HTMLDivElement | null>(null);
+  const displayImage =
+    product.enableVariantImageSwitch && hasVariants
+      ? product.variantImages?.[selectedVariant] ?? product.images[0]
+      : product.images[0];
 
   useEffect(() => {
     if (!variantOpen) return;
@@ -42,7 +46,7 @@ export default function ProductCard({ product }: Props) {
       {/* Image */}
       <Link to={`/product/${product.slug}`} className="relative block overflow-hidden aspect-square bg-stone/10">
         <img
-          src={product.images[0]}
+          src={displayImage}
           alt={product.name}
           className="w-full h-full object-cover transition-opacity duration-500 group-hover:opacity-90"
           loading="lazy"

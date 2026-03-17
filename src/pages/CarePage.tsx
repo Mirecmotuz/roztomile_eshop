@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Flame } from 'lucide-react';
+import { Flame, ShieldAlert } from 'lucide-react';
 
 const sections = [
   {
@@ -28,6 +28,45 @@ const sections = [
       '✨ Díky těmto jednoduchým pravidlům si můžete dekorativní svíčku užít bezpečně a zároveň ocenit její jedinečný design.',
   },
 ];
+
+const safety = {
+  icon: <ShieldAlert size={20} />,
+  title: 'Bezpečnostní informace pro spotřebitele',
+  color: 'stone',
+  blocks: [
+    {
+      heading: 'Upozornění:',
+      items: [
+        'Vonné svíčky jsou určeny pouze pro dospělé a svéprávné osoby. Používání je na vlastní nebezpečí.',
+        'Nepoužívejte svíčky k vnitřní konzumaci!',
+        'Vonné svíčky nejsou určeny k jídlu.',
+      ],
+    },
+    {
+      heading: 'Bezpečnost při hoření:',
+      items: [
+        'Svíčku umístěte na nehořlavý podnos nebo talířek.',
+        'Nikdy nenechávejte svíčku bez dozoru a nestavte ji přímo na nábytek či citlivé povrchy.',
+        'Knot před každým zapálením zkraťte na 3–5 mm.',
+        'Hoření doporučujeme maximálně 1 hodinu a během něj se svíčkou nemanipulujte.',
+      ],
+    },
+    {
+      heading: 'Speciální upozornění:',
+      items: [
+        'Některé esenciální oleje nejsou vhodné pro těhotné a kojící ženy, malé děti a zvířata.',
+        'Vonné oleje použité ve svíčkách jsou přírodní, bez parabenů a ftalátů, nebyly testovány na zvířatech a splňují evropské bezpečnostní normy (IFRA, SDS).',
+      ],
+    },
+    {
+      heading: 'Další informace:',
+      items: [
+        'Minimální trvanlivost svíček je 2 roky.',
+        'Vosk (sójový nebo včelí) je prémiový, bez pesticidů, herbicidů a ropných příměsí.',
+      ],
+    },
+  ],
+};
 
 const colorMap: Record<string, { bg: string; icon: string; dot: string }> = {
   honey: { bg: 'bg-honey-light', icon: 'bg-honey/15 text-honey-dark', dot: 'bg-honey' },
@@ -96,6 +135,39 @@ export default function CarePage() {
             </motion.div>
           );
         })}
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.45, delay: 0.1 }}
+          className={`p-6 sm:p-8 ${colorMap[safety.color].bg} space-y-5`}
+        >
+          <div className="flex items-center gap-3">
+            <div className={`flex items-center justify-center w-9 h-9 ${colorMap[safety.color].icon}`}>
+              {safety.icon}
+            </div>
+            <h2 className="font-serif text-xl font-semibold text-anthracite">{safety.title}</h2>
+          </div>
+
+          <div className="space-y-4">
+            {safety.blocks.map((block) => (
+              <div key={block.heading} className="space-y-2">
+                <p className="text-[11px] font-semibold uppercase tracking-widest text-anthracite">
+                  {block.heading}
+                </p>
+                <ul className="space-y-2">
+                  {block.items.map((item) => (
+                    <li key={item} className="flex items-start gap-3 text-sm text-stone leading-relaxed">
+                      <span className={`mt-2 w-1 h-1 flex-shrink-0 ${colorMap[safety.color].dot}`} />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </motion.div>
       </div>
     </main>
   );

@@ -18,6 +18,8 @@ export interface Product {
   weight?: string;
   burnTime?: string;
   variants?: string[];
+  enableVariantImageSwitch?: boolean;
+  variantImages?: Record<string, string>;
   handmadeTitle?: string;
   handmadeDescription?: string;
   dimensions?: string;

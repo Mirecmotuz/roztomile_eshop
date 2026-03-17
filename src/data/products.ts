@@ -1,6 +1,18 @@
 import { Product } from '../types';
-const photos = import.meta.glob('./photos/*.{jpeg,jpg,png,webp}', { eager: true, as: 'url' }) as Record<string, string>;
-const photo = (fileName: string) => photos[`./photos/${fileName}`];
+const photos = import.meta.glob('./photos/*.{jpeg,jpg,png,webp}', {
+  eager: true,
+  as: 'url',
+}) as Record<string, string>;
+
+const photo = (fileName: string) => {
+  const key = `./photos/${fileName}`;
+  const url = photos[key];
+  if (!url) {
+    console.warn(`[products] Missing photo: ${key}`);
+    return '';
+  }
+  return url;
+};
 
 export const products: Product[] = [
   {
@@ -47,6 +59,16 @@ export const products: Product[] = [
       photo('pruhy_lososove.jpeg')
     ],
     variants: ['zelená', 'růžová', 'žlutá', 'fialová', 'červená', 'světlezelená', 'lososová'],
+    enableVariantImageSwitch: true,
+    variantImages: {
+      zelená: photo('pruhy_zelene.jpeg'),
+      růžová: photo('pruhy_ruzove.jpeg'),
+      žlutá: photo('pruhy_zlte.jpeg'),
+      fialová: photo('pruhy_fialove.jpeg'),
+      červená: photo('pruhy_cervene.jpeg'),
+      světlezelená: photo('pruhy_svetlozelene.jpeg'),
+      lososová: photo('pruhy_lososove.jpeg'),
+    },
     inStock: true,
     weight: '70 g',
     burnTime: '4 hodiny',
@@ -72,6 +94,12 @@ export const products: Product[] = [
       photo('relief_zeleny.jpeg')
     ],
     variants: ['žlutá', 'světlemodrá', 'zelená'],
+    enableVariantImageSwitch: true,
+    variantImages: {
+      žlutá: photo('relief_zlty.jpeg'),
+      světlemodrá: photo('relief_svetlomodra.jpeg'),
+      zelená: photo('relief_zeleny.jpeg'),
+    },
     inStock: true,
     weight: '80 g',
     burnTime: '4 hodiny',
