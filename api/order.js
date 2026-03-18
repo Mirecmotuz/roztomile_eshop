@@ -1,4 +1,3 @@
-import QRCode from 'qrcode';
 
 const EMAILJS_API_URL = 'https://api.emailjs.com/api/v1.0/email/send';
 
@@ -63,7 +62,7 @@ function formatItems(order) {
 }
 
 
-async function buildCommonParams(order) {
+function buildCommonParams(order) {
   const createdAt = new Date(order.createdAt || Date.now());
   const deliveryMethod = (order.formData && order.formData.deliveryMethod) || 'packeta';
   const pickupAddress = 'Vodičkova 677/10, Praha 1';
@@ -222,7 +221,7 @@ async function handler(req, res) {
       });
     }
 
-    const commonParams = await buildCommonParams(order);
+    const commonParams = buildCommonParams(order);
 
     await Promise.all([
       sendEmail(EMAILJS_OWNER_TEMPLATE_ID, STORE_OWNER_EMAIL, commonParams),
