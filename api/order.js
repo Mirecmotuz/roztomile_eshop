@@ -1,3 +1,4 @@
+
 const EMAILJS_API_URL = 'https://api.emailjs.com/api/v1.0/email/send';
 
 const EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID;
@@ -6,8 +7,11 @@ const EMAILJS_CUSTOMER_TEMPLATE_ID = process.env.EMAILJS_CUSTOMER_TEMPLATE_ID;
 const EMAILJS_PUBLIC_KEY = process.env.EMAILJS_PUBLIC_KEY;
 const EMAILJS_ACCESS_TOKEN = process.env.EMAILJS_PRIVATE_KEY;
 const STORE_OWNER_EMAIL = process.env.VITE_OWNER_EMAIL;
-const STORE_IBAN = process.env.VITE_STORE_IBAN;
 const TURNSTILE_SECRET_KEY = process.env.TURNSTILE_SECRET_KEY;
+const STORE_IBAN = process.env.VITE_STORE_IBAN;
+const ACCOUNT_NUMBER = process.env.VITE_ACCOUNT_NUMBER;
+const BANK_CODE = process.env.VITE_BANK_CODE;
+
 
 const IP_WINDOW_MS = 10 * 60 * 1000; // 10 minút
 const IP_MAX_REQUESTS = 50;
@@ -57,15 +61,17 @@ function formatItems(order) {
     .join('\n');
 }
 
+
 function buildCommonParams(order) {
   const createdAt = new Date(order.createdAt || Date.now());
   const deliveryMethod = (order.formData && order.formData.deliveryMethod) || 'packeta';
   const pickupAddress = 'Vodičkova 677/10, Praha 1';
+  
 
   return {
     variable_symbol: order.variableSymbol,
     order_id: order.id,
-    total_amount: Number(order.totalAmount || 0).toFixed(2).replace('.', ','),
+    total_amount: Number(order.totalAmount || 0).toFixed(2),
     items_list: formatItems(order),
     customer_name: `${order.formData.firstName} ${order.formData.lastName}`,
     customer_email: order.formData.email,
@@ -81,6 +87,8 @@ function buildCommonParams(order) {
       dateStyle: 'long',
       timeStyle: 'short',
     }),
+    account_number: ACCOUNT_NUMBER || '',
+    bank_code: BANK_CODE || '',
   };
 }
 

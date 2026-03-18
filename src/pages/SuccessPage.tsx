@@ -158,8 +158,7 @@ export default function SuccessPage() {
 
   if (!order) return null;
 
-  const shipping = order.formData.deliveryMethod === 'packeta' ? 2.9 : 0;
-  const grandTotal = order.totalAmount + shipping;
+  const grandTotal = order.totalAmount;
 
   return (
     <main className="max-w-2xl mx-auto px-4 py-16">
