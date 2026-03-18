@@ -329,7 +329,7 @@ export default function CheckoutPage() {
         variableSymbol: generateVariableSymbol(),
         items: orderItems,
         formData: form,
-        totalAmount: total,
+        totalAmount: grandTotal,
         createdAt: new Date(),
       };
 
