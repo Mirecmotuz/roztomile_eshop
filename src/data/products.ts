@@ -1,5 +1,5 @@
 import { Product } from '../types';
-const photos = import.meta.glob('./photos/*.{jpeg,jpg,png,webp}', {
+const photos = import.meta.glob('./photos/*.{jpeg,jpg,png,webp,JPG}', {
   eager: true,
   as: 'url',
 }) as Record<string, string>;
@@ -27,12 +27,18 @@ export const products: Product[] = [
     materials: '100 % sójový vosk, bavlněný knot, přírodní barvy do svíček',
     badge: 'Novinka',
     images: [
-      photo('kvetinove_fialove.jpeg')
+      photo('kvetinove_fialove.JPG'),
+      photo('kvetinove_ruzove.JPG'),
     ],
-    variants: ['fialová'],
+    variants: ['fialová', 'růžová'],
+    enableVariantImageSwitch: true,
+    variantImages: {
+      fialová: photo('kvetinove_fialove.JPG'),
+      růžová: photo('kvetinove_ruzove.JPG'),
+    },
     inStock: true,
     weight: '151 g',
-    burnTime: '5 hodin',
+    burnTime: '7 hodin',
     handmadeTitle: 'Originální ruční práce',
     handmadeDescription:
       'Drobné odchylky, jako bublinky, rýhy nebo malé rozdíly v barvě, jsou známkou ruční výroby – každý kus je originál.',
@@ -50,24 +56,22 @@ export const products: Product[] = [
     materials: '100 % sójový vosk, bavlněný knot, přírodní barvy do svíček',
     badge: 'Bestseller',
     images: [
-      photo('pruhy_zelene.jpeg'),
-      photo('pruhy_ruzove.jpeg'),
-      photo('pruhy_zlte.jpeg'),
-      photo('pruhy_fialove.jpeg'),
-      photo('pruhy_cervene.jpeg'),
-      photo('pruhy_svetlozelene.jpeg'),
-      photo('pruhy_lososove.jpeg')
+      photo('pruhy_zeleny.JPG'),
+      photo('pruhy_ruzovy.JPG'),
+      photo('pruhy_zluty.JPG'),
+      photo('pruhy_fialovy.JPG'),
+      photo('pruhy_svetlezeleny.JPG'),
+      photo('pruhy_lososovy.JPG')
     ],
-    variants: ['zelená', 'růžová', 'žlutá', 'fialová', 'červená', 'světlezelená', 'lososová'],
+    variants: ['zelená', 'růžová', 'žlutá', 'fialová', 'světlezelená', 'lososová'],
     enableVariantImageSwitch: true,
     variantImages: {
-      zelená: photo('pruhy_zelene.jpeg'),
-      růžová: photo('pruhy_ruzove.jpeg'),
-      žlutá: photo('pruhy_zlte.jpeg'),
-      fialová: photo('pruhy_fialove.jpeg'),
-      červená: photo('pruhy_cervene.jpeg'),
-      světlezelená: photo('pruhy_svetlozelene.jpeg'),
-      lososová: photo('pruhy_lososove.jpeg'),
+      zelená: photo('pruhy_zeleny.JPG'),
+      růžová: photo('pruhy_ruzovy.JPG'),
+      žlutá: photo('pruhy_zluty.JPG'),
+      fialová: photo('pruhy_fialovy.JPG'),
+      světlezelená: photo('pruhy_svetlezeleny.JPG'),
+      lososová: photo('pruhy_lososovy.JPG'),
     },
     inStock: true,
     weight: '70 g',
@@ -89,16 +93,24 @@ export const products: Product[] = [
       'Ručně litá svíčka ze sójového vosku díky své textuře působí přirozeně a elegantně, krásně vynikne samostatně i v kombinaci s pruhovaným Velikonočním vajíčkem. Utvoří vaši jarní či Velikonoční výzdobu.',
     materials: '100 % sójový vosk, bavlněný knot, přírodní barvy do svíček',
     images: [
-      photo('relief_zlty.jpeg'),
-      photo('relief_svetlomodra.jpeg'),
-      photo('relief_zeleny.jpeg')
+      photo('relief_zluty.JPG'),
+      photo('relief_svetle_zeleny.JPG'),
+      photo('relief_zeleny.JPG'),
+      photo('relief_bily.JPG'),
+      photo('relief_ruzovy.JPG'),
+      photo('relief_fialovy.JPG'),
+      photo('relief_modry.JPG'),
     ],
-    variants: ['žlutá', 'světlemodrá', 'zelená'],
+    variants: ['žlutá', 'světlezelená', 'zelená', 'bílá', 'růžová', 'fialová', 'modrá'],
     enableVariantImageSwitch: true,
     variantImages: {
-      žlutá: photo('relief_zlty.jpeg'),
-      světlemodrá: photo('relief_svetlomodra.jpeg'),
-      zelená: photo('relief_zeleny.jpeg'),
+      žlutá: photo('relief_zluty.JPG'),
+      světlezelená: photo('relief_svetle_zeleny.JPG'),
+      zelená: photo('relief_zeleny.JPG'),
+      bílá: photo('relief_bily.JPG'),
+      růžová: photo('relief_ruzovy.JPG'),
+      fialová: photo('relief_fialovy.JPG'),
+      modrá: photo('relief_modry.JPG'),
     },
     inStock: true,
     weight: '80 g',
@@ -107,44 +119,69 @@ export const products: Product[] = [
     handmadeTitle: 'Originální ruční práce',
     handmadeDescription:
       'Drobné odchylky, jako bublinky, rýhy nebo malé rozdíly v barvě, jsou známkou ruční výroby – každý kus je originál.',
-    }
-  // {
-  //   id: '4',
-  //   name: 'Včelí vosk — Natural wrap S (3 ks)',
-  //   slug: 'vcelaci-vosk-wrap-small',
-  //   price: 9.90,
-  //   category: 'včelí vosk',
-  //   shortDescription: 'Ekologická alternativa k potravinové fólii z přírodního včelího vosku.',
-  //   description:
-  //     'Sada tří malých voskovaných plátýnek (velikost S) jako udržitelná náhrada za plastovou potravinovou fólii. Přírodní včelí vosk, jojobový olej a pryskyřice stromu pinie zaručují pevné uzavření potravin. Pratelné ve studené vodě, vydrží 1 rok.',
-  //   materials: 'Organická bavlna, včelí vosk, jojobový olej, pryskyřice pinie',
-  //   badge: 'Bestseller',
-  //   images: [
-  //     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-  //     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-  //   ],
-  //   inStock: true,
-  // },
-  // {
-  //   id: '5',
-  //   name: 'Včelí vosk — Natural wrap M (3 ks)',
-  //   slug: 'vcelaci-vosk-wrap-medium',
-  //   price: 11.90,
-  //   category: 'včelí vosk',
-  //   shortDescription: 'Středně velká voskovaná plátýnka pro zeleninu a ovoce.',
-  //   description:
-  //     'Sada tří voskovaných plátýnek velikosti M. Ideální na zabalení sýrů, zeleniny, chleba nebo misek. Teplo rukou aktivuje vosk, který se pevně přitiskne k povrchu. 100 % přírodní, kompostovatelné.',
-  //   materials: 'Organická bavlna, včelí vosk, jojobový olej, pryskyřice pinie',
-  //   images: [
-  //     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-  //     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
-  //   ],
-  //   inStock: true,
-  // },
+    },
+  {
+    id: '4',
+    name: 'Velikonoční vajíčko s loučním kvítím',
+    slug: 'velikonocni-vajicko-s-loucnim-kvitim',
+    price: 100,
+    category: 'svíčky',
+    shortDescription: 'Ručně litá sójová svíčka.',
+    description:
+      'Přineste kousek jara do svého domova s naším ručně litým Velikonočním vajíčkem ze sójového vosku, zdobeným jemným lučním kvítím. Svíčka, která a zároveň dodá vašemu prostoru útulnou jarní atmosféru.',
+    materials: '100 % sójový vosk, bavlněný knot, přírodní barvy do svíček',
+    badge: 'Bestseller',
+    images: [
+      photo('lucni_kviti_ruzovy.JPG'),
+      photo('lucni_kviti_fialove.JPG'),
+      photo('lucni_kviti_zeleny.JPG'),
+    ],
+    variants: ['růžová', 'fialová', 'zelená'],
+    enableVariantImageSwitch: true,
+    variantImages: {
+      růžová: photo('lucni_kviti_ruzovy.JPG'),
+      fialová: photo('lucni_kviti_fialove.JPG'),
+      zelená: photo('lucni_kviti_zeleny.JPG'),
+    },
+    inStock: true,
+    weight: '105 g',
+    burnTime: '5 hodiny',
+    dimensions: 'výška: 7,5 cm | šířka: 5,5 cm',
+    handmadeTitle: 'Originální ruční práce',
+    handmadeDescription:
+      'Drobné odchylky, jako bublinky, rýhy nebo malé rozdíly v barvě, jsou známkou ruční výroby – každý kus je originál.',
+    },
+  {
+    id: '5',
+    name: 'Velikonoční vajíčko se zajíčkem',
+    slug: 'velikonocni-vajicko-se-zajickem',
+    price: 100,
+    category: 'svíčky',
+    shortDescription: 'Ručně litá sójová svíčka.',
+    description:
+      'Přineste kousek jara do svého domova s naším ručně litým Velikonočním vajíčkem ze sójového vosku, zdobeným krásným zajíčkem. Svíčka, která a zároveň dodá vašemu prostoru útulnou jarní atmosféru.',
+    materials: '100 % sójový vosk, bavlněný knot, přírodní barvy do svíček',
+    images: [
+      photo('zajic_ruzova.JPG')
+    ],
+    variants: ['růžová'],
+    enableVariantImageSwitch: true,
+    variantImages: {
+      růžová: photo('zajic_ruzova.JPG'),
+    },
+    inStock: true,
+    weight: '100 g',
+    burnTime: '5 hodin',
+    dimensions: 'výška: 7 cm | šířka: 5,5 cm',
+    handmadeTitle: 'Originální ruční práce',
+    handmadeDescription:
+      'Drobné odchylky, jako bublinky, rýhy nebo malé rozdíly v barvě, jsou známkou ruční výroby – každý kus je originál.',
+  },
+  
   // {
   //   id: '6',
-  //   name: 'Včelí vosk — Natural wrap L (2 ks)',
-  //   slug: 'vcelaci-vosk-wrap-large',
+  //   name: 'Voskovaný obrousek S',
+  //   slug: 'voskovany-obrusek-s',
   //   price: 11.90,
   //   category: 'včelí vosk',
   //   shortDescription: 'Velká voskovaná plátýnka na celé bochníky chleba a mísy.',
