@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import { ChevronDown, ShoppingBag } from 'lucide-react';
 import { Product } from '../types';
 import { useCartStore } from '../store/cartStore';
+import { getUnitPrice } from '../utils/productPricing';
+
+const formatKc = (n: number) => `${n.toFixed(2).replace('.', ',')} Kč`;
 
 interface Props {
   product: Product;
@@ -128,7 +131,9 @@ export default function ProductCard({ product }: Props) {
 
         <div className="flex items-center justify-between gap-2">
           <span className="font-serif text-base font-semibold text-anthracite">
-            {product.price.toFixed(2).replace('.', ',')} Kč
+            {product.enableVariantPriceSwitch && product.variants?.length
+              ? formatKc(getUnitPrice(product, selectedVariant || product.variants![0]))
+              : formatKc(product.price)}
           </span>
           <button
             onClick={() => {

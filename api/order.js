@@ -1,4 +1,3 @@
-
 const EMAILJS_API_URL = 'https://api.emailjs.com/api/v1.0/email/send';
 
 const EMAILJS_SERVICE_ID = process.env.EMAILJS_SERVICE_ID;
@@ -12,11 +11,16 @@ const STORE_IBAN = process.env.VITE_STORE_IBAN;
 const ACCOUNT_NUMBER = process.env.VITE_ACCOUNT_NUMBER;
 const BANK_CODE = process.env.VITE_BANK_CODE;
 
-
 const IP_WINDOW_MS = 10 * 60 * 1000; // 10 minút
-const IP_MAX_REQUESTS = 50;
+const IP_MAX_REQUESTS =
+  Number(process.env.ORDER_RATE_LIMIT_IP_MAX) > 0
+    ? Number(process.env.ORDER_RATE_LIMIT_IP_MAX)
+    : 50;
 const EMAIL_WINDOW_MS = 60 * 60 * 1000; // 1 hodina
-const EMAIL_MAX_REQUESTS = 3;
+const EMAIL_MAX_REQUESTS =
+  Number(process.env.ORDER_RATE_LIMIT_EMAIL_MAX) > 0
+    ? Number(process.env.ORDER_RATE_LIMIT_EMAIL_MAX)
+    : 3;
 
 const ipRequests = new Map();
 const emailRequests = new Map();
@@ -51,22 +55,38 @@ function isRateLimited(store, key, windowMs, maxRequests) {
   return false;
 }
 
+function validateOrderItemsUnitPrices(order) {
+  const items = order.items || [];
+  if (!Array.isArray(items)) {
+    return false;
+  }
+  for (let idx = 0; idx < items.length; idx += 1) {
+    const unitPrice = Number(items[idx].unitPrice);
+    if (!Number.isFinite(unitPrice) || unitPrice < 0) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function formatItems(order) {
   return (order.items || [])
     .map((i) => {
       const variant = i.variant || i.selectedVariant;
-      const nameWithVariant = variant ? `${i.product.name} (${variant})` : i.product.name;
-      return `${nameWithVariant} × ${i.quantity} = ${(i.product.price * i.quantity).toFixed(2)} Kč`;
+      const p = i.product || {};
+      const name = variant ? `${p.name} (${variant})` : p.name;
+      const unit = Number(i.unitPrice);
+      const qty = Number(i.quantity);
+      const safeQty = Number.isFinite(qty) ? qty : 0;
+      return `${name} × ${i.quantity} = ${(unit * safeQty).toFixed(2)} Kč`;
     })
     .join('\n');
 }
-
 
 function buildCommonParams(order) {
   const createdAt = new Date(order.createdAt || Date.now());
   const deliveryMethod = (order.formData && order.formData.deliveryMethod) || 'packeta';
   const pickupAddress = 'Vodičkova 677/10, Praha 1';
-  
 
   return {
     variable_symbol: order.variableSymbol,
@@ -221,6 +241,10 @@ async function handler(req, res) {
       });
     }
 
+    if (!validateOrderItemsUnitPrices(order)) {
+      return json(res, 400, { error: 'Neplatná data objednávky.' });
+    }
+
     const commonParams = buildCommonParams(order);
 
     await Promise.all([
@@ -240,4 +264,3 @@ async function handler(req, res) {
 handler.resetRateLimitStores = resetRateLimitStores;
 
 export default handler;
-

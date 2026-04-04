@@ -1,4 +1,4 @@
-export type ProductCategory = 'svíčky' | 'včelí vosk' | 'balzámy';
+export type ProductCategory = 'svíčky' | 'voskové obaly' | 'balzámy';
 
 export type ProductBadge = 'Novinka' | 'Bestseller';
 
@@ -20,6 +20,9 @@ export interface Product {
   variants?: string[];
   enableVariantImageSwitch?: boolean;
   variantImages?: Record<string, string>;
+  enableVariantPriceSwitch?: boolean;
+  variantPrices?: Record<string, number>;
+  variantDimensions?: Record<string, string>;
   handmadeTitle?: string;
   handmadeDescription?: string;
   dimensions?: string;
@@ -35,6 +38,8 @@ export interface CartItem {
 export interface OrderItem {
   product: Product;
   quantity: number;
+  /** Jednotková cena riadku v čase objednávky (z getUnitPrice na checkoute). */
+  unitPrice: number;
   variant?: string;
 }
 

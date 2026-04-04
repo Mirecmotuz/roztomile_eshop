@@ -6,6 +6,7 @@ import QRCode from 'qrcode';
 import { Order } from '../types';
 import { config } from '../config';
 import { fadeUpVariants, staggerContainer } from '../utils/motion';
+import { getUnitPrice } from '../utils/productPricing';
 
 // Animated SVG checkmark path
 function AnimatedCheck() {
@@ -287,7 +288,11 @@ export default function SuccessPage() {
         <motion.div variants={fadeUpVariants} className="w-full bg-white border border-gray-100 rounded-lg shadow-soft p-6 text-left space-y-3">
           <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wide">Objednané položky</h2>
           <ul className="divide-y divide-gray-50">
-            {order.items.map(({ product, quantity, variant }) => {
+            {order.items.map(({ product, quantity, variant, unitPrice: storedUnit }) => {
+              const unit =
+                typeof storedUnit === 'number' && Number.isFinite(storedUnit)
+                  ? storedUnit
+                  : getUnitPrice(product, variant);
               const displayName = variant ? `${product.name} (${variant})` : product.name;
               return (
                 <li key={`${product.id}-${variant ?? 'default'}`} className="flex items-center justify-between gap-4 py-2.5 first:pt-0 last:pb-0">
@@ -300,7 +305,7 @@ export default function SuccessPage() {
                     <p className="text-sm text-anthracite">{displayName}</p>
                   </div>
                   <p className="text-sm font-semibold text-anthracite flex-shrink-0">
-                    {quantity} × {product.price.toFixed(2).replace('.', ',')} Kč
+                    {quantity} × {unit.toFixed(2).replace('.', ',')} Kč
                   </p>
                 </li>
               );

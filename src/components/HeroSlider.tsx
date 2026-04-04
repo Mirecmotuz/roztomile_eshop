@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
-const photos = import.meta.glob('../data/photos/*.{jpeg,jpg,png,webp}', {
+const photos = import.meta.glob('../data/photos/*.{jpeg,jpg,png,webp,JPG}', {
   eager: true,
   as: 'url',
 }) as Record<string, string>;
@@ -28,23 +28,23 @@ const slides = [
     cta: 'To chci',
     to: '/?category=svíčky&focus=products',
   },
-  // {
-  //   id: 2,
-  //   image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=85',
-  //   tag: '100 % přírodní',
-  //   heading: 'Přírodní balzámy\n na rty',
-  //   sub: 'Jen to, co příroda dala. Žádný parafín, žádné silikony — to nejlepší pro vaše rty.',
-  //   cta: 'To chci',
-  //   to: '/?category=včelí vosk&focus=products',
-  // },
+  {
+    id: 2,
+    image: photo('voskove_ubrousky_set_S+M+L.JPG'),
+    tag: '100 % přírodní',
+    heading: 'Voskové obaly\n ubrousky',
+    sub: 'Ekologická alternativa k potravinové fólii a alobalu.',
+    cta: 'To chci',
+    to: '/?category=voskové obaly&focus=products',
+  },
   // {
   //   id: 3,
   //   image: 'https://images.unsplash.com/photo-1586495777744-4e6232bf5e2f?w=1600&q=85',
   //   tag: 'Zero Waste',
-  //   heading: 'Včelí vosk –\n šetrný k planetě a vaší kuchyni',
+  //   heading: 'Voskové obaly –\n šetrný k planetě a vaší kuchyni',
   //   sub: 'Ekologická alternativa plastové fólie z přírodního včelího vosku. Vydrží až rok.',
   //   cta: 'To chci',
-  //   to: '/?category=balzámy&focus=products',
+  //   to: '/?category=voskové obaly&focus=products',
   // },
 ];
 

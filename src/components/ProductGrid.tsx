@@ -3,12 +3,15 @@ import { useSearchParams } from 'react-router-dom';
 import { ChevronDown, SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from './ProductCard';
 import { products } from '../data/products';
-import { ProductCategory } from '../types';
+import { ProductCategory, type Product } from '../types';
+
+/** Poradí v katalogu pro řazení „Doporučené“ (nižší index = dříve v products). */
+const productCatalogIndex = new Map(products.map((p, i) => [p.id, i] as const));
 
 const categories: { value: ProductCategory | 'all'; label: string }[] = [
   { value: 'all', label: 'Všechny' },
   { value: 'svíčky', label: 'Svíčky' },
-  { value: 'včelí vosk', label: 'Včelí vosk' },
+  { value: 'voskové obaly', label: 'Voskové obaly' },
   { value: 'balzámy', label: 'Balzámy' },
 ];
 
@@ -107,10 +110,24 @@ export default function ProductGrid() {
       });
     }
 
-    if (sort === 'price-asc') list = [...list].sort((a, b) => a.price - b.price);
-    if (sort === 'price-desc') list = [...list].sort((a, b) => b.price - a.price);
-    if (sort === 'name') list = [...list].sort((a, b) => a.name.localeCompare(b.name, 'cs'));
-    return list;
+    const compare = (a: Product, b: Product): number => {
+      if (a.inStock !== b.inStock) return a.inStock ? -1 : 1;
+
+      switch (sort) {
+        case 'default':
+          return (productCatalogIndex.get(a.id) ?? 0) - (productCatalogIndex.get(b.id) ?? 0);
+        case 'price-asc':
+          return a.price - b.price;
+        case 'price-desc':
+          return b.price - a.price;
+        case 'name':
+          return a.name.localeCompare(b.name, 'cs');
+        default:
+          return 0;
+      }
+    };
+
+    return [...list].sort(compare);
   }, [activeCategory, sort, search]);
 
   const setCategory = (cat: ProductCategory | 'all') => {

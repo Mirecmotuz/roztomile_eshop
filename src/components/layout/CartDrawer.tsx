@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, ShoppingBag, Trash2, Plus, Minus } from 'lucide-react';
 import { useCartStore } from '../../store/cartStore';
+import { getUnitPrice } from '../../utils/productPricing';
 
 export default function CartDrawer() {
   const { isOpen, closeCart, items, removeItem, updateQuantity, totalPrice } = useCartStore();
@@ -75,6 +76,7 @@ export default function CartDrawer() {
               ) : (
                 <ul className="space-y-5">
                   {items.map(({ product, quantity, selectedVariant, image }) => {
+                    const unitPrice = getUnitPrice(product, selectedVariant);
                     const displayName = selectedVariant
                       ? `${product.name} (${selectedVariant})`
                       : product.name;
@@ -93,7 +95,7 @@ export default function CartDrawer() {
                             {displayName}
                           </p>
                           <p className="font-serif text-sm text-honey font-semibold mt-1">
-                            {product.price.toFixed(2).replace('.', ',')} Kč
+                            {unitPrice.toFixed(2).replace('.', ',')} Kč
                           </p>
 
                           {/* Quantity controls */}
