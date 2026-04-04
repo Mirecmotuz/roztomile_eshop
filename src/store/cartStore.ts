@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { CartItem, Product } from '../types';
+import { getUnitPrice } from '../utils/productPricing';
 
 interface CartStore {
   items: CartItem[];
@@ -95,7 +96,10 @@ export const useCartStore = create<CartStore>()(
       totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
 
       totalPrice: () =>
-        get().items.reduce((sum, i) => sum + i.product.price * i.quantity, 0),
+        get().items.reduce(
+          (sum, i) => sum + getUnitPrice(i.product, i.selectedVariant) * i.quantity,
+          0,
+        ),
     }),
     {
       name: 'roztomile-cart',

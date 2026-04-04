@@ -3,7 +3,9 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShoppingBag, ArrowLeft, Minus, Plus, Leaf, Clock, Weight, ChevronDown } from 'lucide-react';
 import { getProductBySlug } from '../data/products';
+import { categoryAccordionByCategory } from '../data/categoryAccordionContent';
 import { useCartStore } from '../store/cartStore';
+import { getUnitPrice } from '../utils/productPricing';
 
 export default function ProductDetail() {
   const { slug } = useParams<{ slug: string }>();
@@ -16,9 +18,12 @@ export default function ProductDetail() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantity, setQuantity] = useState(1);
   const [added, setAdded] = useState(false);
-  const [careOpen, setCareOpen] = useState(false);
+  const [categoryAccordionOpen, setCategoryAccordionOpen] = useState(false);
   const hasVariants = Array.isArray(product?.variants) && (product?.variants?.length ?? 0) > 0;
   const isVariantSwitching = Boolean(product?.enableVariantImageSwitch) && hasVariants;
+  const showVariantPicker =
+    hasVariants &&
+    (isVariantSwitching || Boolean(product?.enableVariantPriceSwitch));
   const [selectedVariant, setSelectedVariant] = useState<string>('');
   const [variantOpen, setVariantOpen] = useState(false);
   const variantRef = useRef<HTMLDivElement | null>(null);
@@ -29,7 +34,15 @@ export default function ProductDetail() {
     if (!isVariantSwitching) {
       setSelectedImageIndex(0);
       setSelectedImage('');
-      setSelectedVariant('');
+      if (
+        product.enableVariantPriceSwitch &&
+        Array.isArray(product.variants) &&
+        product.variants.length > 0
+      ) {
+        setSelectedVariant(product.variants[0]);
+      } else {
+        setSelectedVariant('');
+      }
       return;
     }
 
@@ -58,6 +71,10 @@ export default function ProductDetail() {
     };
   }, [variantOpen]);
 
+  useEffect(() => {
+    setCategoryAccordionOpen(false);
+  }, [product?.id]);
+
   if (!product) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center gap-4 text-center px-4">
@@ -74,10 +91,28 @@ export default function ProductDetail() {
     ? selectedImage || variantImage
     : product.images[selectedImageIndex];
 
+  const variantKeyForPrice =
+    hasVariants && product.enableVariantPriceSwitch
+      ? selectedVariant || product.variants![0]
+      : '';
+  const displayedUnitPrice =
+    hasVariants && product.enableVariantPriceSwitch
+      ? getUnitPrice(product, variantKeyForPrice)
+      : product.price;
+
+  const displayDimensions =
+    hasVariants && product.enableVariantPriceSwitch
+      ? product.variantDimensions?.[variantKeyForPrice] ?? product.dimensions
+      : product.dimensions;
+
+  const categoryAccordionConfig = categoryAccordionByCategory[product.category];
+
   const handleAddToCart = () => {
     const variantToUse =
       hasVariants && product.variants && product.variants.length > 0
-        ? (isVariantSwitching ? selectedVariant || product.variants[0] : product.variants[0])
+        ? showVariantPicker
+          ? selectedVariant || product.variants[0]
+          : product.variants[0]
         : undefined;
     for (let i = 0; i < quantity; i += 1) {
       addItem(product, variantToUse);
@@ -171,9 +206,9 @@ export default function ProductDetail() {
             </p>
             <h1 className="font-serif text-4xl font-semibold text-anthracite leading-tight">{product.name}</h1>
             <p className="font-serif text-3xl font-semibold text-anthracite mt-4">
-              {product.price.toFixed(2).replace('.', ',')} Kč
+              {displayedUnitPrice.toFixed(2).replace('.', ',')} Kč
             </p>
-            {isVariantSwitching && (
+            {showVariantPicker && (
               <div className="mt-4 max-w-xs relative" ref={variantRef}>
                 <label className="sr-only" htmlFor={`variant-detail-${product.id}`}>
                   Barva produktu
@@ -271,108 +306,73 @@ export default function ProductDetail() {
                 </div>
               </div>
             )}
-            {product.dimensions && (
+            {displayDimensions && (
               <div className="flex items-start gap-2 p-3 bg-stone/8">
                 <Weight size={14} className="text-stone mt-0.5 flex-shrink-0" />
                 <div>
                   <p className="text-[10px] font-semibold text-stone uppercase tracking-wide">Rozměry</p>
-                  <p className="text-xs text-stone/80 mt-0.5">{product.dimensions}</p>
+                  <p className="text-xs text-stone/80 mt-0.5">{displayDimensions}</p>
                 </div>
               </div>
             )}
           </div>
 
-          {/* Care accordion */}
-          <div className="bg-cream border border-anthracite/8">
-            <button
-              type="button"
-              onClick={() => setCareOpen((o) => !o)}
-              aria-expanded={careOpen}
-              className="w-full flex items-center justify-between gap-3 p-4 text-left"
-            >
-              <span className="font-serif text-base font-semibold text-anthracite">
-                Použití, péče a bezpečnostní upozornění o svíčce
-              </span>
-              <ChevronDown
-                size={16}
-                className={`shrink-0 text-stone transition-transform ${careOpen ? 'rotate-180' : ''}`}
-              />
-            </button>
+          {categoryAccordionConfig && (
+            <div className="bg-cream border border-anthracite/8">
+              <button
+                type="button"
+                onClick={() => setCategoryAccordionOpen((o) => !o)}
+                aria-expanded={categoryAccordionOpen}
+                className="w-full flex items-center justify-between gap-3 p-4 text-left"
+              >
+                <span className="font-serif text-base font-semibold text-anthracite">
+                  {categoryAccordionConfig.title}
+                </span>
+                <ChevronDown
+                  size={16}
+                  className={`shrink-0 text-stone transition-transform ${categoryAccordionOpen ? 'rotate-180' : ''}`}
+                />
+              </button>
 
-            {careOpen && (
-              <div className="border-t border-anthracite/8 p-4">
-                <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
-                  <div className="space-y-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-stone">
-                      Co očekávat při hoření:
-                    </p>
-                    <ul className="space-y-2">
-                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
-                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
-                        Nerovnoměrné odhořívání: U dekorativních svíček je kvůli jejich specifickému tvaru běžné a
-                        přirozené.
-                      </li>
-                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
-                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
-                        Stékání vosku: Vzhledem k designu může vosk vytékat více než u klasických svíček. Vždy používejte
-                        dostatečně velký nehořlavý podnos, nikdy nestavte svíčku přímo na nábytek.
-                      </li>
-                    </ul>
+              {categoryAccordionOpen && (
+                <div className="border-t border-anthracite/8 p-4">
+                  <div className="space-y-4 max-h-72 overflow-y-auto pr-1">
+                    {categoryAccordionConfig.sections.map((section, sIdx) => (
+                      <div key={`${section.heading}-${sIdx}`} className="space-y-2">
+                        <p className="text-[11px] font-semibold uppercase tracking-widest text-stone">
+                          {section.heading}
+                        </p>
+                        <ul className="space-y-2">
+                          {section.bullets.map((bullet, bIdx) => (
+                            <li
+                              key={bIdx}
+                              className="flex items-start gap-3 text-sm text-stone leading-relaxed"
+                            >
+                              <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
+                              {bullet}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+
+                    {categoryAccordionConfig.footerCareLink && (
+                      <p className="text-xs text-stone/70">
+                        {categoryAccordionConfig.footerCareLink.before}
+                        <Link to="/care" className="text-honey hover:underline">
+                          {categoryAccordionConfig.footerCareLink.linkLabel}
+                        </Link>
+                        {categoryAccordionConfig.footerCareLink.after}
+                      </p>
+                    )}
+                    {categoryAccordionConfig.footerPlain && (
+                      <p className="text-xs text-stone/70">{categoryAccordionConfig.footerPlain}</p>
+                    )}
                   </div>
-
-                  <div className="space-y-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-stone">
-                      Jak se o svíčku starat:
-                    </p>
-                    <ul className="space-y-2">
-                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
-                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
-                        Knot: Před každým zapálením jej zkraťte na 3–5 mm. Zamezíte tím silnému kouření.
-                      </li>
-                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
-                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
-                        Doba hoření: Ideálně maximálně 1 hodinu. Během hoření se svíčkou nemanipulujte, aby nedošlo k
-                        převržení nebo vytečení vosku.
-                      </li>
-                    </ul>
-                  </div>
-
-                  <div className="space-y-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-widest text-stone">
-                      Bezpečnostní upozornění:
-                    </p>
-                    <ul className="space-y-2">
-                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
-                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
-                        Určeno pouze pro dospělé a svéprávné osoby. Používejte na vlastní nebezpečí.
-                      </li>
-                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
-                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
-                        Svíčky nejsou určeny ke konzumaci.
-                      </li>
-                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
-                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
-                        Nikdy nenechávejte hořící svíčku bez dozoru.
-                      </li>
-                      <li className="flex items-start gap-3 text-sm text-stone leading-relaxed">
-                        <span className="mt-2 w-1 h-1 flex-shrink-0 bg-stone" />
-                        Upozornění pro citlivé osoby: Některé esenciální oleje nemusí být vhodné pro těhotné/kojící ženy,
-                        malé děti a zvířata. Naše oleje jsou bez parabenů a ftalátů a splňují normy IFRA.
-                      </li>
-                    </ul>
-                  </div>
-
-                  <p className="text-xs text-stone/70">
-                    💡 Kompletní informace o složení a podrobný návod najdete na stránce{' '}
-                    <Link to="/care" className="text-honey hover:underline">
-                      Péče o svíčky
-                    </Link>
-                    .
-                  </p>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
 
           {/* Materials */}
           <div className="border-t border-anthracite/8 pt-5">

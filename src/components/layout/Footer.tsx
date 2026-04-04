@@ -11,7 +11,7 @@ const quickLinks = [
 
 const categories = [
   { to: '/?category=svíčky&focus=products', label: 'Svíčky' },
-  { to: '/?category=včelí vosk&focus=products', label: 'Včelí vosk' },
+  { to: '/?category=voskové obaly&focus=products', label: 'Voskové obaly' },
   { to: '/?category=balzámy&focus=products', label: 'Balzámy na rty' },
 ];
 
@@ -40,7 +40,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-sm leading-relaxed text-cream/60">
-              Ručně vyráběné svíčky, včelí vosk a přírodní kosmetika s láskou pro váš domov. Každý kousek vzniká v malém ateliéru.
+              Ručně vyráběné svíčky, voskové obaly a přírodní kosmetika s láskou pro váš domov. Každý kousek vzniká v malém ateliéru.
             </p>
             <div className="flex items-center gap-3 pt-1">
               <a

@@ -6,14 +6,16 @@ let handler: HandlerFn;
 let resetRateLimitStores: () => void;
 
 beforeAll(async () => {
-  // Nastavíme testovacie env pre EmailJS a Turnstile
+  // Nastavíme testovacie env pre EmailJS a Turnstile (musí sedieť s order.js)
   process.env.EMAILJS_SERVICE_ID = 'test-service';
   process.env.EMAILJS_OWNER_TEMPLATE_ID = 'owner-template';
   process.env.EMAILJS_CUSTOMER_TEMPLATE_ID = 'customer-template';
   process.env.EMAILJS_PUBLIC_KEY = 'public-key';
-  process.env.STORE_OWNER_EMAIL = 'owner@example.com';
+  process.env.EMAILJS_PRIVATE_KEY = 'test-private-token';
+  process.env.VITE_OWNER_EMAIL = 'owner@example.com';
   process.env.STORE_IBAN = 'SK00TESTIBAN';
   process.env.TURNSTILE_SECRET_KEY = 'turnstile-secret';
+  process.env.ORDER_RATE_LIMIT_IP_MAX = '5';
 
   const mod: any = await import('./order.js');
   const exported = mod.default ?? mod;
@@ -71,21 +73,23 @@ beforeEach(() => {
   });
 });
 
+/** Mock ako reálny checkout: product z klienta (price 110), Packeta +79 → totalAmount 189. */
 function createValidOrder(overrides: any = {}) {
   return {
     id: 'RZT-123',
     variableSymbol: '123456',
-    totalAmount: 10,
+    totalAmount: 189,
     createdAt: new Date(1_000_000).toISOString(),
     items: [
       {
         product: {
-          id: 'p1',
+          id: '1',
           name: 'Test produkt',
-          price: 10,
+          price: 110,
           images: ['https://example.com/img.jpg'],
         },
         quantity: 1,
+        unitPrice: 110,
       },
     ],
     formData: {
@@ -94,6 +98,7 @@ function createValidOrder(overrides: any = {}) {
       email: 'jan.novak@example.com',
       phone: '+421900000000',
       note: '',
+      deliveryMethod: 'packeta',
       packetaPoint: {
         id: 'PACKETA1',
         name: 'Packeta bod',
@@ -155,6 +160,42 @@ describe('api/order handler', () => {
     expect((globalThis.fetch as any).mock.calls.length).toBe(3);
   });
 
+  it('EmailJS items_list používa unitPrice z položky (variantová cena)', async () => {
+    const { req, res, resData } = createReqRes({
+      order: createValidOrder({
+        totalAmount: 199,
+        items: [
+          {
+            product: {
+              id: 'v1',
+              name: 'Variantový test',
+              price: 100,
+              enableVariantPriceSwitch: true,
+              variantPrices: { modrá: 100, červená: 120 },
+              images: [],
+            },
+            quantity: 1,
+            unitPrice: 120,
+            variant: 'červená',
+          },
+        ],
+      }),
+    });
+
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(parseJson(resData)).toEqual({ success: true });
+
+    const fetchMock = globalThis.fetch as ReturnType<typeof vi.fn>;
+    const emailBodies = fetchMock.mock.calls
+      .filter((call: unknown[]) => String((call as any)[0]).includes('api.emailjs.com'))
+      .map((call: unknown[]) => JSON.parse((call as any)[1].body as string));
+    expect(emailBodies.length).toBeGreaterThanOrEqual(1);
+    expect(emailBodies[0].template_params.items_list).toContain('120.00');
+    expect(emailBodies[0].template_params.items_list).toContain('červená');
+  });
+
   it('honeypot – objednávka sa ticho preskočí a fetch sa nevolá', async () => {
     const { req, res, resData } = createReqRes({ honeypot: 'bot-input' });
 
@@ -175,7 +216,7 @@ describe('api/order handler', () => {
 
     expect(res.statusCode).toBe(400);
     const json = parseJson(resData);
-    expect(json.error).toContain('Objednávku sa nepodarilo odoslať');
+    expect(json.error).toContain('Objednávku se nepodařilo odeslat');
   });
 
   it('rate-limit podľa IP – viac ako povolený počet requestov vráti 429', async () => {
@@ -204,7 +245,7 @@ describe('api/order handler', () => {
 
     expect(res.statusCode).toBe(429);
     const json = parseJson(resData);
-    expect(json.error).toContain('Odosielate objednávky príliš často');
+    expect(json.error).toContain('Odesíláte objednávky příliš často');
   });
 
   it('rate-limit podľa emailu – viac ako povolený počet na email vráti 429', async () => {
@@ -238,7 +279,7 @@ describe('api/order handler', () => {
     await handler(req, res);
     expect(res.statusCode).toBe(429);
     const json = parseJson(resData);
-    expect(json.error).toContain('Z tohto e-mailu bolo odoslaných príliš veľa objednávok');
+    expect(json.error).toContain('příliš mnoho objednávek');
   });
 
   it('CAPTCHA chýba – vráti 400', async () => {
@@ -248,7 +289,7 @@ describe('api/order handler', () => {
 
     expect(res.statusCode).toBe(400);
     const json = parseJson(resData);
-    expect(json.error).toContain('Overenie proti spamu zlyhalo');
+    expect(json.error).toContain('Ověření proti spamu selhalo');
   });
 
   it('CAPTCHA – Turnstile vráti neúspech (success: false) → 403', async () => {
@@ -258,7 +299,7 @@ describe('api/order handler', () => {
 
     expect(res.statusCode).toBe(403);
     const json = parseJson(resData);
-    expect(json.error).toContain('Overenie proti spamu zlyhalo');
+    expect(json.error).toContain('Ověření proti spamu selhalo');
   });
 
   it('CAPTCHA – Turnstile HTTP chyba → 503', async () => {
@@ -268,7 +309,7 @@ describe('api/order handler', () => {
 
     expect(res.statusCode).toBe(503);
     const json = parseJson(resData);
-    expect(json.error).toContain('Overenie proti spamu zlyhalo');
+    expect(json.error).toContain('Ověření proti spamu selhalo');
   });
 
   it('neplatná štruktúra objednávky – chýba formData/items → 400', async () => {
@@ -278,7 +319,62 @@ describe('api/order handler', () => {
 
     expect(res.statusCode).toBe(400);
     const json = parseJson(resData);
-    expect(json.error).toContain('Neplatné dáta objednávky');
+    expect(json.error).toContain('Neplatná data objednávky');
   });
 
+  it('neplatná unitPrice na položke → 400', async () => {
+    const { req, res, resData } = createReqRes({
+      order: createValidOrder({
+        items: [
+          {
+            ...createValidOrder().items[0],
+            unitPrice: Number.NaN,
+          },
+        ],
+      }),
+    });
+
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(400);
+    expect(parseJson(resData).error).toContain('Neplatná data objednávky');
+  });
+
+  it('ľubovoľné product.id z klienta — server nekontroluje katalóg → 200', async () => {
+    const { req, res, resData } = createReqRes({
+      order: createValidOrder({
+        totalAmount: 80,
+        items: [
+          {
+            product: { id: 'cokolvek', name: 'X', price: 1, images: [] },
+            quantity: 1,
+            unitPrice: 1,
+          },
+        ],
+      }),
+    });
+
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(parseJson(resData)).toEqual({ success: true });
+  });
+
+  it('pickup: totalAmount bez dopravy → 200', async () => {
+    const { req, res, resData } = createReqRes({
+      order: createValidOrder({
+        totalAmount: 110,
+        formData: {
+          ...createValidOrder().formData,
+          deliveryMethod: 'pickup',
+          packetaPoint: null,
+        },
+      }),
+    });
+
+    await handler(req, res);
+
+    expect(res.statusCode).toBe(200);
+    expect(parseJson(resData)).toEqual({ success: true });
+  });
 });

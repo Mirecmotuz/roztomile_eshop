@@ -1,4 +1,5 @@
 import type { Order } from '../types';
+import { getUnitPrice } from './productPricing';
 
 const PICKUP_ADDRESS = 'Vodičkova 677/10, Praha 1';
 
@@ -6,7 +7,11 @@ export function formatItems(order: Order): string {
   return (order.items || [])
     .map((i) => {
       const name = i.variant ? `${i.product.name} (${i.variant})` : i.product.name;
-      return `${name} × ${i.quantity} = ${(i.product.price * i.quantity).toFixed(2)} Kč`;
+      const unit =
+        typeof i.unitPrice === 'number' && Number.isFinite(i.unitPrice)
+          ? i.unitPrice
+          : getUnitPrice(i.product, i.variant);
+      return `${name} × ${i.quantity} = ${(unit * i.quantity).toFixed(2)} Kč`;
     })
     .join('\n');
 }

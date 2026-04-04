@@ -5,6 +5,7 @@ import { MapPin, ShoppingBag, ChevronRight, AlertCircle, Loader2 } from 'lucide-
 import { useCartStore } from '../store/cartStore';
 import { Order, OrderFormData, OrderItem, PacketaPoint } from '../types';
 import { config } from '../config';
+import { getUnitPrice } from '../utils/productPricing';
 
 const generateVariableSymbol = (): string =>
   String(Math.floor(100000 + (Date.now() % 900000)));
@@ -321,6 +322,7 @@ export default function CheckoutPage() {
       const orderItems: OrderItem[] = items.map(({ product, quantity, selectedVariant }) => ({
         product,
         quantity,
+        unitPrice: getUnitPrice(product, selectedVariant),
         variant: selectedVariant,
       }));
 
@@ -592,6 +594,7 @@ export default function CheckoutPage() {
 
               <ul className="divide-y divide-anthracite/6 space-y-3">
                 {items.map(({ product, quantity, selectedVariant, image }) => {
+                  const unitPrice = getUnitPrice(product, selectedVariant);
                   const displayName = selectedVariant
                     ? `${product.name} (${selectedVariant})`
                     : product.name;
@@ -607,7 +610,7 @@ export default function CheckoutPage() {
                         <p className="text-xs text-stone mt-0.5">× {quantity}</p>
                       </div>
                     <p className="text-sm font-semibold text-anthracite flex-shrink-0">
-                      {(product.price * quantity).toFixed(2).replace('.', ',')} Kč
+                      {(unitPrice * quantity).toFixed(2).replace('.', ',')} Kč
                       </p>
                     </li>
                   );
